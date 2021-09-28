@@ -1,0 +1,492 @@
+[
+    {
+        "file": "Song+Say-0123in6ch-channels.m4a",
+        "path": "examples/",
+        "part": "Complete",
+        "format": "AAC 4 channel FOA in 5.1 file that can be played also on iOS"
+    },
+    {
+        "file": "AMB8-Ascendo-256k.m4a",
+        "path": "sounds-amb8",
+        "size": "3.93 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "AMB8-BIS-Eigenmike-256k.m4a ",
+        "path": "sounds-amb8",
+        "size": "6.45 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "AMB8-Gaudete-256k.m4a",
+        "path": "sounds-amb8",
+        "size": "4.38 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "AMB8-Rigoletto-256k.m4a",
+        "path": "sounds-amb8",
+        "size": "2.94 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "AMB8-Stereo05-256k.m4a",
+        "path": "sounds-amb8",
+        "size": "4.20 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "2H1P-BIS-Eigenmike-192k.m4a",
+        "path": "sounds-amb8",
+        "size": "5.24MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "2H1P-Gaudete-192k.m4a",
+        "path": "sounds-amb8",
+        "size": "3.29 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "2H1P-Rigoletto-192k.m4a ",
+        "path": "sounds-amb8",
+        "size": "2.21 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "2H1P-Stereo05-192k.m4a",
+        "path": "sounds-amb8",
+        "size": "3.15 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "2H1P-Annon8-1-6-heAAC-All.m4a",
+        "path": "sounds-amb8",
+        "size": "214.58 KB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "2H1P-8trk-announce48k-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "1.67 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "3H1P-BIS-Eigenmike-256k.m4a",
+        "path": "sounds-amb8",
+        "size": "6.6 MB",
+        "ambiorder": "3rd"
+    },
+    {
+        "file": "3H1P-Rigoletto-256k.m4a",
+        "path": "sounds-amb8",
+        "size": "7.33 MB",
+        "ambiorder": "3rd"
+    },
+    {
+        "file": "3H1P-Stereo05-192k.m4a",
+        "path": "sounds-amb8",
+        "size": "10.49 MB",
+        "ambiorder": "3rd"
+    },
+    {
+        "file": "BIS-Eigenmike-640k-AAC-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "16.07 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "BIS-Eigenmike-640k-M4A-amb8.m4a",
+        "path": "sounds-amb8",
+        "size": "16.09 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Annon8-1-8-heAAC-vbr3-amb8.m4a",
+        "path": "sounds-amb8",
+        "size": "193.3 KB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Ascendo-48k-24b-640k-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "9.63 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Ascendo-48k-24b-vbr-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "3.82 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Duomo-04-640k-amb8.m4a",
+        "path": "sounds-amb8",
+        "size": "56.87 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Gaudete-640k-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "10.92 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Gaudete-vbr-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "4.54 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Khorikos-JoyfulNo-640k-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "13.57 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Khorikos-JoyfulNo-vbr-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "6.43 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Lumen-640k-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "9.29 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "OctoMic-TotaPulchraEs-640k-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "13.06 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "OctoMic-TotaPulchraEs-vbr-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "5.6 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Rigoletto-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "7.33 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "SomebodyToLove-640k-amb8.aac",
+        "path": "sounds-amb8",
+        "size": "13.36 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "Stereo05-amb8.m4a",
+        "path": "sounds-amb8",
+        "size": "10.49 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "SayTRK-LFE-foa-aac.m4a",
+        "path": "examples/sounds",
+        "size": "2.72 MB",
+        "ambiorder": "1st"
+    },
+    {
+        "file": "Song-LFE-foa-aac.m4a",
+        "path": "examples/sounds",
+        "size": "9.24 MB",
+        "ambiorder": "1st"
+    },
+    {
+        "file": "5-1-AAC.mp4",
+        "path": "examples/sounds",
+        "size": "1.79 MB"
+    },
+    {
+        "file": "5-1-EBU-heAAC.mp4",
+        "path": "examples/sounds",
+        "size": "915.82 KB"
+    },
+    {
+        "file": "5-1-LFE-video-AAC.mp4",
+        "path": "examples/sounds",
+        "size": "994.51 KB"
+    },
+    {
+        "file": "5_1-LFE-heAAC.mp4",
+        "path": "examples/sounds",
+        "size": "889.39 KB"
+    },
+    {
+        "file": "7-1-heAAC.mp4",
+        "path": "examples/sounds",
+        "size": "874.08 KB"
+    },
+    {
+        "file": "Song-FOA-AACLC.m4a",
+        "path": "examples/sounds",
+        "size": "7.8 MB",
+        "ambiorder": "1st"
+    },
+    {
+        "file": "Song-FOA-HeAACV1.m4a",
+        "path": "examples/sounds",
+        "size": "5.13 MB",
+        "ambiorder": "1st"
+    },
+    {
+        "file": "DankosSwingOpus.opus",
+        "path": "examples/sounds",
+        "size": "52.7 MB",
+        "part": "Complete",
+        "ambiorder": "3rd",
+        "format": "16 channel OPUS Ambix B-Format",
+        "description": "TOA - Recorded by bosse"
+    },
+    {
+        "file": "bann_01-08.ogg",
+        "path": "examples/sounds",
+        "size": "1.65 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "HOA3_rec2_01-08.ogg",
+        "path": "examples/sounds",
+        "size": "1.14 MB"
+    },
+    {
+        "file": "HOA3_rec4_01-08.ogg",
+        "path": "examples/sounds",
+        "size": "1.84 MB"
+    },
+    {
+        "file": "Stereo13_01-08.m4a",
+        "path": "examples/sounds",
+        "size": "12.69 MB"
+    },
+    {
+        "file": "HOA3_rec1_01-08.ogg",
+        "path": "examples/sounds",
+        "size": "1.1 MB"
+    },
+    {
+        "file": "HOA3_rec3_01-08.ogg",
+        "path": "examples/sounds",
+        "size": "1.25 MB"
+    },
+    {
+        "file": "1dirct-12 sec.wav",
+        "path": "examples/sounds",
+        "size": "6.56 MB"
+    },
+    {
+        "file": "toa-ambix-Trk-16ogg.ogg",
+        "path": "examples/resources",
+        "size": "1.45 MB",
+        "part": "Complete",
+        "ambiorder": "3rd",
+        "format": "16 channel OPUS Ambix B-Format",
+        "description": "Channel announcements"
+    },
+    {
+        "file": "toa-ambix-America-16ch-ogg.opus",
+        "path": "examples/resources",
+        "size": "58.95 MB",
+        "part": "Complete",
+        "ambiorder": "3rd",
+        "description": "Core-Sound 3 order Ambix - Orkester kör musik"
+    },
+    {
+        "file": "opus-OctoMic-TotaPulchraEs-ambiX-O3-excerpt-9ch-vbr4096.opus",
+        "path": "examples/resources",
+        "size": "47.43 MB",
+        "part": "Complete",
+        "ambiorder": "3rd",
+        "format": "16 channel OPUS Ambix B-Format",
+        "description": "Core-Sound 3 order Ambix - Operamusik"
+    },
+    {
+        "file": "multichannel-16ogg.ogg",
+        "path": "examples/resources",
+        "size": "1.45 MB",
+        "ambiorder": "3rd"
+    },
+    {
+        "file": "jlwarbirds3.amb",
+        "path": "examples/resources",
+        "size": "28.41 MB",
+        "part": "Complete",
+        "ambiorder": "1st",
+        "format": "4 Channel Ambix B-Format",
+        "license": "# jlwarbirds3.amb\n\nThis file is created by John Leonard and is released under \nthe Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)\n(https://creativecommons.org/licenses/by-nd/4.0/):\n\nObtained from:\nhttp://ambisonia.com/Members/soundmanjohn/ambisonicfile.2007-07-11.7419901870/"
+    },
+    {
+        "file": "Stereo13-3oA-opus.opus",
+        "path": "examples/resources",
+        "size": "49.41 MB",
+        "ambiorder": "3rd",
+        "format": "16 channel OPUS Ambix B-Format",
+        "description": "Angelo farina 3 order Ambix - Operamusik",
+        "license": "Permission to use"
+    },
+    {
+        "file": "Stereo05-3oA-opus.opus",
+        "path": "examples/resources",
+        "size": "32.97 MB",
+        "ambiorder": "3rd",
+        "format": "16 channel OPUS Ambix B-Format",
+        "description": "Angelo farina 3 order Ambix - Operamusik",
+        "license": "Permission to use"
+    },
+    {
+        "file": "Opus-Ogg-16trk-VBR-4048.opus",
+        "path": "examples/resources",
+        "size": "2.12 MB",
+        "ambiorder": "3rd"
+    },
+    {
+        "file": "LICENSE",
+        "path": "examples/resources",
+        "size": "599 B"
+    },
+    {
+        "file": "Duomo04-3oA-opus.opus",
+        "path": "examples/resources",
+        "size": "57.34 MB",
+        "part": "Complete",
+        "ambiorder": "3rd",
+        "format": "16 channel OPUS ",
+        "description": "Angelo farina 3 order Ambix - Operamusik",
+        "license": "Permission to use"
+    },
+    {
+        "file": "4ch_B_FuMaNorm_FuMaOrd_speech.wav",
+        "path": "examples/resources",
+        "size": "21.64 MB",
+        "ambiorder": "1st",
+        "license": "# 4ch_B_FuMaNorm_FuMaOrd_speech.wav\n\nThis file is created by Michael Chapman and is released under \nthe Creative Commons Attribution-Noncommercial-Share Alike 3.0 license\n(https://creativecommons.org/licenses/by-nc-sa/3.0):\n\nObtained from:\nhttp://mchapman.com/amb/soft/positions/"
+    },
+    {
+        "file": "480-3oA-opus.opus",
+        "path": "examples/resources",
+        "size": "84.67 MB",
+        "ambiorder": "3rd"
+    },
+    {
+        "file": "3oa_example_ch8-ch15.wav",
+        "path": "examples/resources",
+        "size": "1.63 MB"
+    },
+    {
+        "file": "3oa_example_ch0-ch7.wav",
+        "path": "examples/resources",
+        "size": "1.63 MB"
+    },
+    {
+        "file": "Annon8-ACC-LC.m4a",
+        "path": "sounds",
+        "size": 2850,
+        "ambiorder": "2nd",
+        "format": "8 channels 48kHz AAC LC libfdk",
+        "description": "Channel Announcment + 1kHz tone No LFE filter",
+        "license": "Recorded Bo-Erik Sandholm"
+    },
+    {
+        "file": "Annon8.m4a",
+        "path": "sounds",
+        "size": "1480 kB",
+        "ambiorder": "2nd",
+        "format": "8 channels 48kHz AAC LC SBR libfdk",
+        "description": "Channel Announcment + 1kHz tone No LFE filter",
+        "license": "Recorded Bo-Erik Sandholm"
+    },
+    {
+        "file": "ann_09-16.ogg",
+        "path": "sounds",
+        "size": "1.65 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "ann_01-08.ogg",
+        "path": "sounds",
+        "size": "1.84 MB",
+        "ambiorder": "2nd"
+    },
+    {
+        "file": "1dirct-12-sec.wav",
+        "path": "sounds",
+        "size": "6.56 MB"
+    },
+    {
+        "file": "sample2.wav",
+        "path": "sounds",
+        "size": "1.77 MB"
+    },
+    {
+        "file": "sample1.ogg",
+        "path": "sounds",
+        "size": "120.04 KB"
+    },
+    {
+        "file": "BF_rec1.wav",
+        "path": "sounds",
+        "size": "7.36 MB"
+    },
+    {
+        "file": "BF_rec1.ogg",
+        "path": "sounds",
+        "size": "2.14 MB"
+    },
+    {
+        "file": "4ch_B_FuMaNorm_FuMaOrd_speech.wav",
+        "path": "sounds",
+        "size": "21.64 MB",
+        "license": "# 4ch_B_FuMaNorm_FuMaOrd_speech.wav\n\nThis file is created by Michael Chapman and is released under \nthe Creative Commons Attribution-Noncommercial-Share Alike 3.0 license\n(https://creativecommons.org/licenses/by-nc-sa/3.0):\n\nObtained from:\nhttp://mchapman.com/amb/soft/positions/"
+    },
+    {
+        "file": "1dirct-12 sec.wav",
+        "path": "sounds",
+        "size": "6.56 MB"
+    },
+    {
+        "file": "SOA-HEAAC-Ambix.m4a",
+        "path": "sounds",
+        "size": "21 MB",
+        "part": "Standalone",
+        "format": "AAC SOA",
+        "description": "2 Soundtracks 4 and 5 channels , in sequence for ambisonics, first track 4 chan can be played as FOA by it self, the Second track is channel 5-9 for SOA, so needs to be playt together with first track for a Second order Ambisonic Decode."
+    },
+    {
+        "file": "TOA-HEAAC-Ambix.m4a",
+        "path": "sounds",
+        "size": "36 MB",
+        "part": "Standalone",
+        "format": "AAC TOA",
+        "description": "4 Soundtracks 4 + 5 + 5 +2 channels in sequence for ambisonics, first track 4 chan can be played as FOA by it self, the Second track is channel 5-9 for SOA, ad ttrack 3 +4 to get 16 channels, all4 trk needs to be played together for a First  order Ambisonic Decode.\t"
+    },
+    {
+        "file": "playlist-DASH.mdp",
+        "path": "sounds",
+        "ambiorder": "2nd",
+        "description": "Manifest For DASH"
+    },
+    {
+        "file": "audio1_track1_dashinit.m4a",
+        "path": "sounds",
+        "ambiorder": "1st",
+        "format": "AAC LC 4 channels foa in 5.1",
+        "description": "Segmented soundtrack file1 For DASH"
+    },
+    {
+        "file": "audio2_track1_dashinit.m4a",
+        "path": "sounds",
+        "ambiorder": "2nd",
+        "format": "AAC LC 5 channels in 5.1 fill to SOA",
+        "description": "Segmented soundtrack file1 For DASH"
+    },
+    {
+        "file": "ADanko.mpd",
+        "path": "sounds",
+        "size": "15.42 KB"
+    }
+]

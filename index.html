@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+<head>
+    <title>Headtrack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="./static/style.css">
+</head>
+<body>
+
+<div class="user-interaction" id="startSessionCover">
+    <div class="user-interaction-box">
+        <h1>Headtracker</h1>
+        <ul>
+            <li>Use your browser with the manual sliders and playback audio with omnitone</li>
+            <li>Use your local headtracker with websocket "SignalR" on port '5000' or define it yourself with: "address?socketurl=localhost&socketport=5001"</li>
+        </ul>
+        <p>
+            <button id="startSession">Start the session</button>
+        </p>
+    </div>
+</div>
+
+<div class="main-box">
+
+    <div class="main-box-container">
+        <h3 class="ht-form--field">
+            Headtracking settings and playout
+        </h3>
+
+        <div class="ht-form--field" id="statusSocket">
+            <div class="input-status-feedback">
+                <span>Live headtracker (<span data-key="ht-ws-address"></span>):</span> <span data-key="status-ws-headtracker"></span>
+            </div>
+        </div>
+
+        <div class="ht-form--field">
+            <div class="input-status-feedback">
+                <span>Saved reference:</span> <span class="status-ht-reference" data-key="status-ht-reference">0.00, 0.00, 0.00</span>
+            </div>
+            <button id="inputSaveHeadtrackReference" class="ht-custom-btn">Save reference</button> 
+            <button id="inputResetHeadtrackReference" class="ht-custom-btn">Reset reference</button>
+        </div>
+
+        <div class="ht-form--button">
+            <div class="input-status-feedback">
+                <span>Current ambisonic order:</span>
+                <span class="status-ht-reference" id="status-ambisonic-order">
+                </span>
+            </div>
+            <button id="btnToggleAmbisonicDecoderOrder" class="ht-custom-btn">Toggle ambisonic order</button>
+        </div>
+
+        <div class="ht-form--field main-box-dropzone" id="dropzone">
+            <div>
+                <span id="droped-file-name">Drop file here</span> <label for="inputCustomAudioFile">or select one from your computer</label> <span id="txtLoadedAudioFile"></span>
+            </div>
+        </div>
+
+        <!-- AUDIO FILE FOR PLAYBACK -->
+        <div class="ht-form--button">
+            <input id="inputCustomAudioFile" class="input-file-upload input-load-audio-file" type="file" accept="audio/*" />
+
+            <div class="select-split">
+                <select name="inputSelectAudioFile" id="inputSelectAudioFile">
+                    <option value="" disabled>Select audio to play</option>
+                </select>
+
+                <button id="btnToggleAudioPlayer" data-key="audio-play-button">Play</button>
+            </div>
+
+            <style>
+                .select-split {
+                    display: flex;
+                }
+
+                .audio-selector {
+                    display: block;
+                }
+                .audio-selector #audio-dropdown-btn {
+                    display: block;
+                    cursor: pointer;
+                    background: orange;
+                }
+                ul#audio-dropdown-list {
+                    background: #280938;
+                    border-radius: 4px;
+                    border: 1px solid #3d0a58;
+                }
+                .audio-selector #audio-dropdown-list li {
+                    border-bottom: 1px solid #592177;
+                    cursor: pointer;
+                }
+                .audio-selector #audio-dropdown-list li.selected {
+                    background: #5a2277;
+                }
+                span.item-title {
+                    pointer-events: none;
+                }
+                span.item-size {
+                    float: right;
+                    overflow: hidden;
+                    font-size: 0.8rem;
+                    pointer-events: none;
+                }
+                span.item-format {
+                    display: block;
+                    font-size: 0.7rem;
+                    pointer-events: none;
+                }
+                span.item-license {
+                    display: block;
+                    font-size: 0.8rem;
+                    pointer-events: none;
+                }
+            </style>
+
+            <div class="audio-selector">
+                <!-- <div id="audio-dropdown-btn">Select Audio</div> -->
+                <ul id="audio-dropdown-list"></ul>
+            </div>
+
+            <button id="btnToggleAudioPlayback" data-key="audio-play-button">Play</button>
+            <div class="audio-play-timer"><span data-key="status-audio-timer">0/0</span>s</div>
+        </div>
+<style>
+#channel-selector {
+    display: flex;
+    flex-direction: column;
+    margin: 0.4rem 0;
+}
+
+.ch-row {
+    display: grid;
+    grid-template-columns: 3fr repeat(16, 1fr);
+    justify-items: center;
+    align-items: center;
+}
+
+#channel-selector input[type="radio"] {
+  display: none;
+}
+
+#channel-selector label {
+  display: inline-block;
+  background-color: #102648;
+  padding: 8px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+#channel-selector input[type="radio"]:checked+label {
+  background-color: #d2eef3;
+}
+
+#channel-selector input[type="radio"]:checked+label.silent {
+  background-color: #5b167d;
+}
+</style>
+        <div class="ht-form--button">
+            <div class="input-status-feedback">
+                <span>Audio routing:</span>
+            </div>
+            <div id="channel-selector"></div>
+
+            <button data-template="silent">silent</button>
+            <button data-template="default">ambix8</button>
+            <button data-template="linear">straight</button>
+            <button data-template="so2h1p">2H*P</button>
+            <button data-template="so3h1p">3H*P</button>
+        </div>
+
+        <div class="ht-form--button">
+            <div class="input-status-feedback">
+                <span>Audio level:</span>
+            </div>
+            <div data-key="audio-gain-level">0dB</div>
+
+            <button data-input-gain="0">0dB</button>
+            <button data-input-gain="-6">-6dB</button>
+            <button data-input-gain="-12">-12dB</button>
+            <button data-input-gain="-18">-18dB</button>
+            <button data-input-gain="-24">-24dB</button>
+        </div>
+
+        <div class="ht-form--button">
+            <label>
+                Custom audio URL:<br/>
+                <input id="inputCustomAudioLink" type="text" placeholder="http://ex.com/data.mp3" />
+            </label>
+        </div>
+
+        <div class="ht-form--button" style="display:none">
+            <div class="input-status-feedback" id="audioPlayerContainer">
+                <!-- Append audio element here -->
+            </div>
+        </div>
+
+    </div>
+
+    <div class="main-box-canvas" id="htGfxScene" data-noheight="true">
+        <!-- The beautiful box -->
+    </div>
+
+    <div class="main-box-control">
+
+        <div class="ht-form--button">
+            <!-- <div class="ht-custom-info--euler-info">x=red, Y=green, Z=blue</div><br/> -->
+            X roll (<span id="infoXValue">0</span>&deg;) = <span data-key="euler-x"></span>&deg;<span class="ht-axis-blip x"></span><br/>
+            <input id="inputRangeX" type="range" min="-89" max="89" value="0" step="1" class="range x" />
+            <br/>
+            Y pitch (<span id="infoYValue">0</span>&deg;) = <span data-key="euler-y"></span>&deg;<span class="ht-axis-blip y"></span><br/>
+            <input id="inputRangeY" type="range" min="-89" max="89" value="0" step="1" class="range y" />
+            <br/>
+            Z yaw (<span id="infoZValue">0</span>&deg;) = <span data-key="euler-z"></span>&deg;<span class="ht-axis-blip z"></span><br/>
+            <input id="inputRangeZ" type="range" min="-179" max="179" value="0" step="1" style="direction: rtl" class="range z" />
+        </div>
+
+    </div>
+
+</div>
+    <script src="./static/dist/app.js"></script>
+</body>
+</html>
