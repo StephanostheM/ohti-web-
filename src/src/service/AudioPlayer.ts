@@ -5,87 +5,8 @@ import ArrayUtil from "../utils/ArrayUtil";
 import Events from "../utils/Events";
 import Omnitone from 'omnitone/build/omnitone.min.esm.js';
 import NumberUtil from "../utils/NumberUtil";
-
-export class AudioRoute {
-    public static default = [0, 1, 2, 3, 4, 5, -1, 6, 7, -1, -1, -1, -1, -1, -1, -1] as const;
-    public static linear = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
-    public static so2h1pOld = [0, 1, 2, 3, 4, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] as const;
-    public static so2h1p =[0, 1, 2, 3, 4, -1, -1, -1, 5, -1, -1, -1, -1, -1, -1, -1] as const;
-    public static so3h1pOld = [0, 1, 2, 3, 4, 5, -1, -1, -1, 9, 10, -1, -1, -1, -1, -1] as const;
-    public static so3h1p = [0, 1, 2, 3, 4, -1, -1, -1, 5, 6, -1, -1, -1, -1, -1, 7] as const;
-    public static silent = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] as const;
-}
-
-export enum AudioTemplateRoute {
-    default = "default",
-    linear = "linear",
-    so2h1p = "so2h1p",
-    so3h1p = "so3h1p",
-    silent = "silent"
-}
-
-export class AudioMatrixRoute {
-    public current: any = AudioRoute.default;
-    private customized: boolean = false;
-
-    public readonly inputs: number = 16;
-    public readonly outputs: number = 16;
-
-    public channels(): number {
-        return this.current.length || 0;
-    }
-
-    public getInput(outputIndex: number): number {
-        return this.current[outputIndex];
-    }
-
-    public getCurrent() {
-
-    }
-
-    /**
-     * Routes input to output manually. Inputs and outputs are 0 indexed.
-     * @param outputIndex for destination
-     * @param inputIndex
-     */
-    public setInput(outputIndex: number, inputIndex: number) {
-        this.current[outputIndex] = inputIndex;
-        this.customized = true;
-    }
-
-    /**
-     * Selects audio matrix route template from a few static pre defined audio routes
-     * @param template number from static template
-     */
-    public select(template: AudioTemplateRoute) {
-        this.customized = false;
-        let transfer = null;
-        switch(template) {
-            case AudioTemplateRoute.default:
-                transfer = AudioRoute.default;
-                break;
-            case AudioTemplateRoute.linear:
-                transfer = AudioRoute.linear;
-                break;
-            case AudioTemplateRoute.so2h1p:
-                transfer = AudioRoute.so2h1p;
-                break;
-            case AudioTemplateRoute.so3h1p:
-                transfer = AudioRoute.so3h1p;
-                break;
-            case AudioTemplateRoute.silent:
-                transfer = AudioRoute.silent;
-                break;
-            default:
-                throw new Error("Trying to select audio route template that doesn't exist");
-        }
-
-        this.current = transfer.map(object => object);
-    }
-
-    constructor() {
-    }
-}
+import { AudioTemplateRoute } from "./AudioTemplateRoute";
+import { AudioMatrixRoute } from "./AudioMatrixRoute";
 
 export default class AudioPlayer {
 

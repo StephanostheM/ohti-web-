@@ -3,7 +3,7 @@ import Events from "../utils/Events";
 import QuaternionTools from "../utils/QuaternionTools";
 import AnimationView from "./Animation";
 import AspNetCoreHubListener from "./NetCoreHubListener";
-import AudioPlayer from "./AudioInterface";
+import AudioPlayer from "./AudioPlayer";
 
 export default class HeadtrackerListener extends AspNetCoreHubListener {
 

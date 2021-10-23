@@ -4,7 +4,7 @@ import Events from '../utils/Events';
 import QuaternionTools from '../utils/QuaternionTools';
 import Tool from '../utils/Tools';
 import VectorTools from '../utils/VectorTools';
-import AudioPlayer from './AudioInterface';
+import AudioPlayer from './AudioPlayer';
 import HeadtrackerListener from './HeadtrackerListener';
 
 export default class AnimationView {
