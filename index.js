@@ -13,5 +13,6 @@ const server = http.createServer((req, res) => {
     stream.pipe(res);
 
 })
-
-server.listen(process.env.PORT || 8080)
+const port = process.env.PORT || 8080;
+server.listen(port)
+console.log(`server listening on localhost:${port}`);
