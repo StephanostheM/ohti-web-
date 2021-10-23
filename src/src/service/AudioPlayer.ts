@@ -8,6 +8,7 @@ import NumberUtil from "../utils/NumberUtil";
 import { AudioTemplateRoute } from "./AudioTemplateRoute";
 import { AudioMatrixRoute } from "./AudioMatrixRoute";
 import DOMUtil from "../utils/DOMUtil";
+import AudioFileDrop from "./AudioFileDrop";
 
 export default class AudioPlayer {
 
@@ -239,11 +240,10 @@ export default class AudioPlayer {
         });
 
         // Audio drop
-        const dropzone = Tool.$dom("dropzone");
-        dropzone.addEventListener("dragenter", this.handlerDragEnter, false);
-        dropzone.addEventListener("dragover", this.handleDragOver, false);
-        dropzone.addEventListener("dragleave", this.handlerDragLeave, false);
-        dropzone.addEventListener("drop", this.handleFileDrop, false);
+        const drop = new AudioFileDrop();
+        drop.register((source: string) => {
+            this.audioElement.src = source;
+        });
 
         // Audio playback controls
         Tool.$event("btnToggleAudioPlayback", "click", this.toggleAudioPlayback);
@@ -471,11 +471,11 @@ export default class AudioPlayer {
             });
             console.log("Splitter   :", splitter);
             console.log("Merger     :", merger);
-            console.log("Decoder in :", this.getCurrentDecoder().input);
-            console.log("Decoder out:", this.getCurrentDecoder().output);
+            console.log("Decoder in :", this.getCurrentDecoder.input);
+            console.log("Decoder out:", this.getCurrentDecoder.output);
 
             // Out from Omnitone decoder, send toaudio context
-            merger.connect(this.getCurrentDecoder().input);
+            merger.connect(this.getCurrentDecoder.input);
 
             console.log(`AudioContext state '${this.audioContext.state}'`)
 
@@ -521,7 +521,7 @@ export default class AudioPlayer {
         }
     }
 
-    getCurrentDecoder() {
+    private get getCurrentDecoder() {
         if (this.ambisonicOrderNum == 2) {
             return this.decoderTOA;
         } else if (this.ambisonicOrderNum == 1) {
@@ -536,7 +536,7 @@ export default class AudioPlayer {
      * @param mtx3 3x3 row major matrix
      * @param euler null
      */
-     rotateSoundField(mtx3: any, euler: any = null) {
+    rotateSoundField(mtx3: any, euler: any = null) {
         if (this.ambisonicOrderNum == 2) {
             this.decoderTOA.setRotationMatrix3(mtx3);
         } else if (this.ambisonicOrderNum == 1) {
@@ -544,39 +544,6 @@ export default class AudioPlayer {
         } else {
             this.decoderFOA.setRotationMatrix3(mtx3);
         }
-    }
-
-    handlerDragEnter = (event) => {
-        Tool.$dom("dropzone").style.border = "2px dashed purple";
-    }
-
-    handlerDragLeave = (event) => {
-        Tool.$dom("dropzone").style.border = "2px dashed grey";
-    }
-
-    handleFileDrop = (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        Tool.$dom("dropzone").style.border = "2px dashed green";
-        let $fileName = Tool.$dom("droped-file-name");
-        $fileName.textContent = `Name: ${event.dataTransfer.files[0].name}`;
-
-        const file = event.dataTransfer.files[0];
-        if (!file.type.match("audio.*")) {
-            $fileName.textContent = `ERROR! ${file.name} is not a valid audio file.`;
-            return;
-        } else {
-            $fileName.textContent = `Name: ${file.name} (${file.type}, ${file.size} bytes) Now hit play!`;
-        }
-
-        this.audioElement.src = window.URL.createObjectURL(file);
-    }
-
-    handleDragOver = (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        event.dataTransfer.dropEffect = "copy";
-        Tool.$dom("dropzone").style.border = "2px dashed purple";
     }
 
     // listItem(item) {
