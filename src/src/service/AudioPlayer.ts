@@ -7,6 +7,7 @@ import Omnitone from 'omnitone/build/omnitone.min.esm.js';
 import NumberUtil from "../utils/NumberUtil";
 import { AudioTemplateRoute } from "./AudioTemplateRoute";
 import { AudioMatrixRoute } from "./AudioMatrixRoute";
+import DOMUtil from "../utils/DOMUtil";
 
 export default class AudioPlayer {
 
@@ -351,12 +352,6 @@ export default class AudioPlayer {
         });
     }
 
-    private removeAllChildNodes(parent) {
-        while (parent.firstChild) {
-            parent.removeChild(parent.firstChild);
-        }
-    }
-
     /**
      * Create the matrix routing DOM-view
      */
@@ -414,7 +409,7 @@ export default class AudioPlayer {
         group.append(row);
 
         const container = Tool.$dom("channel-selector");
-        this.removeAllChildNodes(container)
+        DOMUtil.removeAllChildNodes(container);
         container.appendChild(group);
 
         this.mergeChannels();
