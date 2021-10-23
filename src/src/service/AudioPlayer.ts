@@ -21,7 +21,7 @@ export default class AudioPlayer {
     private audioInputGain: GainNode;
     private audioElementSource: MediaElementAudioSourceNode;
 
-    private GLOBAL_AMBI_ORDER: number = 2;
+    private ambisonicOrderNum: number = 2;
 
     private decoderFOA: any;
     private decoderSOA: any;
@@ -124,7 +124,7 @@ export default class AudioPlayer {
         this.decoderFOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.GLOBAL_AMBI_ORDER == 0 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum == 0 ? "ambisonic" : "off";
             this.decoderFOA.setRenderingMode(state);
             this.decoderFOA.output.connect(this.audioContext.destination);
         },
@@ -142,7 +142,7 @@ export default class AudioPlayer {
         this.decoderSOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.GLOBAL_AMBI_ORDER == 1 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
 
             this.decoderSOA.setRenderingMode(state);
             this.decoderSOA.output.connect(this.audioContext.destination);
@@ -162,7 +162,7 @@ export default class AudioPlayer {
         this.decoderTOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.GLOBAL_AMBI_ORDER == 2 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum == 2 ? "ambisonic" : "off";
 
             this.decoderTOA.setRenderingMode(state);
             this.decoderTOA.output.connect(this.audioContext.destination);
@@ -490,13 +490,13 @@ export default class AudioPlayer {
     }
 
     toggleAmbisonicOrder = (event) => {
-        this.GLOBAL_AMBI_ORDER = (this.GLOBAL_AMBI_ORDER+1)%3;
-        if (this.GLOBAL_AMBI_ORDER == 2) {
+        this.ambisonicOrderNum = (this.ambisonicOrderNum+1)%3;
+        if (this.ambisonicOrderNum == 2) {
             document.getElementById("status-ambisonic-order").innerText = "3rd order";
             this.decoderFOA.setRenderingMode("off")
             this.decoderSOA.setRenderingMode("off");
             this.decoderTOA.setRenderingMode("ambisonic");
-        } else if (this.GLOBAL_AMBI_ORDER == 1) {
+        } else if (this.ambisonicOrderNum == 1) {
             document.getElementById("status-ambisonic-order").innerText = "2nd order";
             this.decoderFOA.setRenderingMode("off")
             this.decoderSOA.setRenderingMode("ambisonic");
@@ -527,9 +527,9 @@ export default class AudioPlayer {
     }
 
     getCurrentDecoder() {
-        if (this.GLOBAL_AMBI_ORDER == 2) {
+        if (this.ambisonicOrderNum == 2) {
             return this.decoderTOA;
-        } else if (this.GLOBAL_AMBI_ORDER == 1) {
+        } else if (this.ambisonicOrderNum == 1) {
             return this.decoderSOA;
         } else {
             return this.decoderFOA;
@@ -542,9 +542,9 @@ export default class AudioPlayer {
      * @param euler null
      */
      rotateSoundField(mtx3: any, euler: any = null) {
-        if (this.GLOBAL_AMBI_ORDER == 2) {
+        if (this.ambisonicOrderNum == 2) {
             this.decoderTOA.setRotationMatrix3(mtx3);
-        } else if (this.GLOBAL_AMBI_ORDER == 1) {
+        } else if (this.ambisonicOrderNum == 1) {
             this.decoderSOA.setRotationMatrix3(mtx3);
         } else {
             this.decoderFOA.setRotationMatrix3(mtx3);
