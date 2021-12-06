@@ -1,5 +1,5 @@
 import AnimationView from "./service/Animation";
-import AudioPlayer from "./service/AudioInterface";
+import AudioPlayer from "./service/AudioPlayer";
 import HeadtrackerListener from "./service/HeadtrackerListener";
 import Events from "./utils/Events";
 import Tool from './utils/Tools';
@@ -18,7 +18,7 @@ export class Application {
             document.getElementById("startSessionCover").style.display = "none";
 
             // Headtracker socket listener
-            //this.listener = HeadtrackerListener.getInstance();
+            this.listener = HeadtrackerListener.getInstance();
 
             // Audioplayer
             this.audio = AudioPlayer.getInstance();

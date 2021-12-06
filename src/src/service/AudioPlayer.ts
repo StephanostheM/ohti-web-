@@ -5,87 +5,10 @@ import ArrayUtil from "../utils/ArrayUtil";
 import Events from "../utils/Events";
 import Omnitone from 'omnitone/build/omnitone.min.esm.js';
 import NumberUtil from "../utils/NumberUtil";
-
-export class AudioRoute {
-    public static default = [0, 1, 2, 3, 4, 5, -1, 6, 7, -1, -1, -1, -1, -1, -1, -1] as const;
-    public static linear = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
-    public static so2h1pOld = [0, 1, 2, 3, 4, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] as const;
-    public static so2h1p =[0, 1, 2, 3, 4, -1, -1, -1, 5, -1, -1, -1, -1, -1, -1, -1] as const;
-    public static so3h1pOld = [0, 1, 2, 3, 4, 5, -1, -1, -1, 9, 10, -1, -1, -1, -1, -1] as const;
-    public static so3h1p = [0, 1, 2, 3, 4, -1, -1, -1, 5, 6, -1, -1, -1, -1, -1, 7] as const;
-    public static silent = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] as const;
-}
-
-export enum AudioTemplateRoute {
-    default = "default",
-    linear = "linear",
-    so2h1p = "so2h1p",
-    so3h1p = "so3h1p",
-    silent = "silent"
-}
-
-export class AudioMatrixRoute {
-    public current: any = AudioRoute.default;
-    private customized: boolean = false;
-
-    public readonly inputs: number = 16;
-    public readonly outputs: number = 16;
-
-    public channels(): number {
-        return this.current.length || 0;
-    }
-
-    public getInput(outputIndex: number): number {
-        return this.current[outputIndex];
-    }
-
-    public getCurrent() {
-
-    }
-
-    /**
-     * Routes input to output manually. Inputs and outputs are 0 indexed.
-     * @param outputIndex for destination
-     * @param inputIndex
-     */
-    public setInput(outputIndex: number, inputIndex: number) {
-        this.current[outputIndex] = inputIndex;
-        this.customized = true;
-    }
-
-    /**
-     * Selects audio matrix route template from a few static pre defined audio routes
-     * @param template number from static template
-     */
-    public select(template: AudioTemplateRoute) {
-        this.customized = false;
-        let transfer = null;
-        switch(template) {
-            case AudioTemplateRoute.default:
-                transfer = AudioRoute.default;
-                break;
-            case AudioTemplateRoute.linear:
-                transfer = AudioRoute.linear;
-                break;
-            case AudioTemplateRoute.so2h1p:
-                transfer = AudioRoute.so2h1p;
-                break;
-            case AudioTemplateRoute.so3h1p:
-                transfer = AudioRoute.so3h1p;
-                break;
-            case AudioTemplateRoute.silent:
-                transfer = AudioRoute.silent;
-                break;
-            default:
-                throw new Error("Trying to select audio route template that doesn't exist");
-        }
-
-        this.current = transfer.map(object => object);
-    }
-
-    constructor() {
-    }
-}
+import { AudioTemplateRoute } from "./AudioTemplateRoute";
+import { AudioMatrixRoute } from "./AudioMatrixRoute";
+import DOMUtil from "../utils/DOMUtil";
+import AudioFileDrop from "./AudioFileDrop";
 
 export default class AudioPlayer {
 
@@ -100,7 +23,7 @@ export default class AudioPlayer {
     private audioInputGain: GainNode;
     private audioElementSource: MediaElementAudioSourceNode;
 
-    private GLOBAL_AMBI_ORDER: number = 2;
+    private ambisonicOrderNum: number = 2;
 
     private decoderFOA: any;
     private decoderSOA: any;
@@ -203,7 +126,7 @@ export default class AudioPlayer {
         this.decoderFOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.GLOBAL_AMBI_ORDER == 0 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum == 0 ? "ambisonic" : "off";
             this.decoderFOA.setRenderingMode(state);
             this.decoderFOA.output.connect(this.audioContext.destination);
         },
@@ -221,7 +144,7 @@ export default class AudioPlayer {
         this.decoderSOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.GLOBAL_AMBI_ORDER == 1 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
 
             this.decoderSOA.setRenderingMode(state);
             this.decoderSOA.output.connect(this.audioContext.destination);
@@ -241,7 +164,7 @@ export default class AudioPlayer {
         this.decoderTOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.GLOBAL_AMBI_ORDER == 2 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum == 2 ? "ambisonic" : "off";
 
             this.decoderTOA.setRenderingMode(state);
             this.decoderTOA.output.connect(this.audioContext.destination);
@@ -317,11 +240,10 @@ export default class AudioPlayer {
         });
 
         // Audio drop
-        const dropzone = Tool.$dom("dropzone");
-        dropzone.addEventListener("dragenter", this.handlerDragEnter, false);
-        dropzone.addEventListener("dragover", this.handleDragOver, false);
-        dropzone.addEventListener("dragleave", this.handlerDragLeave, false);
-        dropzone.addEventListener("drop", this.handleFileDrop, false);
+        const drop = new AudioFileDrop();
+        drop.register((source: string) => {
+            this.audioElement.src = source;
+        });
 
         // Audio playback controls
         Tool.$event("btnToggleAudioPlayback", "click", this.toggleAudioPlayback);
@@ -332,7 +254,6 @@ export default class AudioPlayer {
         Tool.$event("btnToggleAmbisonicDecoderOrder", "click", this.toggleAmbisonicOrder);
 
         // Setting Headtrack reference
-        // window.addEventListener("htsetreference", function(e: any) {
         Tool.$event(window, "htsetreference", (e: any) => {
 
             let dataset = document.querySelectorAll("[data-key]");
@@ -430,12 +351,6 @@ export default class AudioPlayer {
         });
     }
 
-    private removeAllChildNodes(parent) {
-        while (parent.firstChild) {
-            parent.removeChild(parent.firstChild);
-        }
-    }
-
     /**
      * Create the matrix routing DOM-view
      */
@@ -493,7 +408,7 @@ export default class AudioPlayer {
         group.append(row);
 
         const container = Tool.$dom("channel-selector");
-        this.removeAllChildNodes(container)
+        DOMUtil.removeAllChildNodes(container);
         container.appendChild(group);
 
         this.mergeChannels();
@@ -555,11 +470,11 @@ export default class AudioPlayer {
             });
             console.log("Splitter   :", splitter);
             console.log("Merger     :", merger);
-            console.log("Decoder in :", this.getCurrentDecoder().input);
-            console.log("Decoder out:", this.getCurrentDecoder().output);
+            console.log("Decoder in :", this.getCurrentDecoder.input);
+            console.log("Decoder out:", this.getCurrentDecoder.output);
 
             // Out from Omnitone decoder, send toaudio context
-            merger.connect(this.getCurrentDecoder().input);
+            merger.connect(this.getCurrentDecoder.input);
 
             console.log(`AudioContext state '${this.audioContext.state}'`)
 
@@ -569,13 +484,13 @@ export default class AudioPlayer {
     }
 
     toggleAmbisonicOrder = (event) => {
-        this.GLOBAL_AMBI_ORDER = (this.GLOBAL_AMBI_ORDER+1)%3;
-        if (this.GLOBAL_AMBI_ORDER == 2) {
+        this.ambisonicOrderNum = (this.ambisonicOrderNum+1)%3;
+        if (this.ambisonicOrderNum == 2) {
             document.getElementById("status-ambisonic-order").innerText = "3rd order";
             this.decoderFOA.setRenderingMode("off")
             this.decoderSOA.setRenderingMode("off");
             this.decoderTOA.setRenderingMode("ambisonic");
-        } else if (this.GLOBAL_AMBI_ORDER == 1) {
+        } else if (this.ambisonicOrderNum == 1) {
             document.getElementById("status-ambisonic-order").innerText = "2nd order";
             this.decoderFOA.setRenderingMode("off")
             this.decoderSOA.setRenderingMode("ambisonic");
@@ -605,10 +520,10 @@ export default class AudioPlayer {
         }
     }
 
-    getCurrentDecoder() {
-        if (this.GLOBAL_AMBI_ORDER == 2) {
+    private get getCurrentDecoder() {
+        if (this.ambisonicOrderNum == 2) {
             return this.decoderTOA;
-        } else if (this.GLOBAL_AMBI_ORDER == 1) {
+        } else if (this.ambisonicOrderNum == 1) {
             return this.decoderSOA;
         } else {
             return this.decoderFOA;
@@ -620,47 +535,14 @@ export default class AudioPlayer {
      * @param mtx3 3x3 row major matrix
      * @param euler null
      */
-     rotateSoundField(mtx3: any, euler: any = null) {
-        if (this.GLOBAL_AMBI_ORDER == 2) {
+    rotateSoundField(mtx3: any, euler: any = null) {
+        if (this.ambisonicOrderNum == 2) {
             this.decoderTOA.setRotationMatrix3(mtx3);
-        } else if (this.GLOBAL_AMBI_ORDER == 1) {
+        } else if (this.ambisonicOrderNum == 1) {
             this.decoderSOA.setRotationMatrix3(mtx3);
         } else {
             this.decoderFOA.setRotationMatrix3(mtx3);
         }
-    }
-
-    handlerDragEnter = (event) => {
-        Tool.$dom("dropzone").style.border = "2px dashed purple";
-    }
-
-    handlerDragLeave = (event) => {
-        Tool.$dom("dropzone").style.border = "2px dashed grey";
-    }
-
-    handleFileDrop = (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        Tool.$dom("dropzone").style.border = "2px dashed green";
-        let $fileName = Tool.$dom("droped-file-name");
-        $fileName.textContent = `Name: ${event.dataTransfer.files[0].name}`;
-
-        const file = event.dataTransfer.files[0];
-        if (!file.type.match("audio.*")) {
-            $fileName.textContent = `ERROR! ${file.name} is not a valid audio file.`;
-            return;
-        } else {
-            $fileName.textContent = `Name: ${file.name} (${file.type}, ${file.size} bytes) Now hit play!`;
-        }
-
-        this.audioElement.src = window.URL.createObjectURL(file);
-    }
-
-    handleDragOver = (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        event.dataTransfer.dropEffect = "copy";
-        Tool.$dom("dropzone").style.border = "2px dashed purple";
     }
 
     // listItem(item) {

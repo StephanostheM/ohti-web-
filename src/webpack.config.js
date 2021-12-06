@@ -20,6 +20,14 @@ module.exports = {
                 test: /\.ts$/,
                 use: "ts-loader"
             },
+            {
+                test: /\.css$/i,
+                use: [
+                    {
+                      loader: 'file-loader',
+                    },
+                  ],
+            }
         ]
     },
     plugins: [
