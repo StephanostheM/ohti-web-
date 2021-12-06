@@ -254,7 +254,6 @@ export default class AudioPlayer {
         Tool.$event("btnToggleAmbisonicDecoderOrder", "click", this.toggleAmbisonicOrder);
 
         // Setting Headtrack reference
-        // window.addEventListener("htsetreference", function(e: any) {
         Tool.$event(window, "htsetreference", (e: any) => {
 
             let dataset = document.querySelectorAll("[data-key]");
