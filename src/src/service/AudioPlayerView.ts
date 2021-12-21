@@ -13,7 +13,20 @@ export default class AudioPlayerView {
 
         this.setupListeners();
 
-        this.generateAudioFileList();
+        //this.generateAudioFileList();
+
+        this.fetchAudioList();
+    }
+
+    private fetchAudioList() {
+        console.log("######");
+        fetch("mediafiles.json").then((data) => data.json()).then((result) => {
+            console.error("=============")
+            console.log(result);
+            this.generateFileList(result);
+        }).catch((error) => {
+            console.error(error);
+        });
     }
 
     private setupListeners() {
@@ -101,6 +114,30 @@ export default class AudioPlayerView {
 
             this.model.inputSelectAudioFile(event.target.dataset.link);
         });
+    }
+
+    private generateFileList(data: any) {
+        const selectListOfAudioFiles = $d.om("inputSelectAudioFile");
+        const itt = $d.om("audio-dropdown-list");
+
+        this.model.links = ArrayUtil.toArray<Sound>(data).map((x) => Sound.FromMedia(x));
+        this.model.links.forEach((audio: Sound) => {
+            if (audio.path == '') {
+                return;
+            }
+            let option = document.createElement("option");
+            option.setAttribute("id", `R-${audio.file}`);
+            option.setAttribute("value", `../${audio.path}/${audio.file}`);
+            option.text = audio.file;
+            selectListOfAudioFiles.appendChild(option);
+
+            let liitem = document.createElement("li");
+            liitem.setAttribute("id", `R-${audio.file}`);
+            liitem.dataset.link = `../${audio.path}/${audio.file}`;
+            liitem.innerHTML = `<span class="item-title">${audio.displayName} ${audio.file}</span> <span class="item-size">${audio.size ? audio.size : ''}</span> <span class="item-format">${audio.format ? audio.format : ''} ${audio.channel_order ? audio.channel_order : ''} = ${audio._order}</span> <span class="item-license">${audio.license ? audio.license : ''}</span>`;
+            itt.appendChild(liitem);
+        });
+        console.log(this.model.links, audioSources)
     }
 
     private generateAudioFileList() {
