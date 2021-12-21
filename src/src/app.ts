@@ -1,5 +1,6 @@
 import AnimationView from "./service/Animation";
 import AudioPlayer from "./service/AudioPlayer";
+import AudioPlayerAmbisonics from "./service/AudioPlayerAmbisonics";
 import HeadtrackerListener from "./service/HeadtrackerListener";
 import Events from "./utils/Events";
 import Tool from './utils/Tools';
@@ -7,6 +8,7 @@ import Tool from './utils/Tools';
 export class Application {
     private listener: HeadtrackerListener;
     private audio: AudioPlayer;
+    private ambiplayer: AudioPlayerAmbisonics;
     private animation: AnimationView;
 
     private event: Events = new Events();
@@ -21,7 +23,8 @@ export class Application {
             this.listener = HeadtrackerListener.getInstance();
 
             // Audioplayer
-            this.audio = AudioPlayer.getInstance();
+            // this.audio = AudioPlayer.getInstance();
+            this.ambiplayer = AudioPlayerAmbisonics.getInstance();
 
             // 3D Animation
             this.animation = AnimationView.getInstance();

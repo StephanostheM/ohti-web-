@@ -5,6 +5,7 @@ import QuaternionTools from '../utils/QuaternionTools';
 import Tool from '../utils/Tools';
 import VectorTools from '../utils/VectorTools';
 import AudioPlayer from './AudioPlayer';
+import AudioPlayerAmbisonics from './AudioPlayerAmbisonics';
 import HeadtrackerListener from './HeadtrackerListener';
 
 export default class AnimationView {
@@ -260,7 +261,7 @@ export default class AnimationView {
 
         // Omnitone rotate soundfield with Matrix
         // Ambisonics.js rotate soundfield with Euler
-        AudioPlayer.getInstance().rotateSoundField(QuaternionTools.quaternionToMatrix(qRefComp), { x: rollValue, y: pitchValue, z: yawValue });
+        AudioPlayerAmbisonics.getInstance().rotateSoundField(QuaternionTools.quaternionToMatrix(qRefComp), { x: rollValue, y: pitchValue, z: yawValue });
 
         // Three.js Rotate 3D model
         this.rotateGraphics(qRefComp);

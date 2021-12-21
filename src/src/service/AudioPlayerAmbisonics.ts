@@ -1,17 +1,18 @@
-import * as audioSources from "../content/soundlinks.json";
 import Tool from '../utils/Tools';
 import Sound from "../models/Sound";
 import ArrayUtil from "../utils/ArrayUtil";
 import Events from "../utils/Events";
-import Omnitone from 'omnitone/build/omnitone.min.esm.js';
 import NumberUtil from "../utils/NumberUtil";
 import { AudioTemplateRoute } from "./AudioTemplateRoute";
 import { AudioMatrixRoute } from "./AudioMatrixRoute";
 import DOMUtil from "../utils/DOMUtil";
 import AudioFileDrop from "./AudioFileDrop";
+import * as ambisonics from "ambisonics";
 import AudioPlayerView from "./AudioPlayerView";
+import * as audioSources from "../content/soundlinks.json";
+import Constants from '../utils/Constants';
 
-export default class AudioPlayer {
+export default class AudioPlayerAmbisonics {
     private $view: AudioPlayerView;
 
     private event: Events = new Events();
@@ -31,12 +32,23 @@ export default class AudioPlayer {
     private decoderSOA: any;
     private decoderTOA: any;
 
-    private static instance: AudioPlayer;
-    public static getInstance(): AudioPlayer {
-        if (AudioPlayer.instance == null) {
-            AudioPlayer.instance = new AudioPlayer();
+
+
+    private sceneMirror: any;
+    private orderLimiter: any;
+    private sceneRotator: any;
+    private binauralDecoder: any;
+    private intensityAnalyser: any;
+    private gainOut: any;
+
+    private orderOut: number;
+
+    private static instance: AudioPlayerAmbisonics;
+    public static getInstance(): AudioPlayerAmbisonics {
+        if (AudioPlayerAmbisonics.instance == null) {
+            AudioPlayerAmbisonics.instance = new AudioPlayerAmbisonics();
         }
-        return AudioPlayer.instance;
+        return AudioPlayerAmbisonics.instance;
     }
 
     private constructor() {
@@ -53,6 +65,197 @@ export default class AudioPlayer {
                 self.audioContext.resume();
             }
         }
+
+        console.log(ambisonics);
+
+        var soundUrl = "sounds/HOA3_rec1.ogg";
+        var irUrl_0 = "IRs/ambisonic2binaural_filters/HOA3_IRC_1008_virtual.wav";
+        var irUrl_1 = "IRs/ambisonic2binaural_filters/aalto2016_N3.wav";
+        var irUrl_2 = "IRs/ambisonic2binaural_filters/HOA3_BRIRs-medium.wav";
+
+
+        var soundBuffer, sound;
+
+        // define HOA mirroring
+        this.sceneMirror = new ambisonics.sceneMirror(this.audioContext, Constants.maxOrder);
+        console.log(this.sceneMirror);
+        // define HOA order limiter (to show the effect of order)
+        this.orderLimiter = new ambisonics.orderLimiter(this.audioContext, Constants.maxOrder, this.orderOut);
+        console.log(this.orderLimiter);
+        // define HOA rotator
+        this.sceneRotator = new ambisonics.sceneRotator(this.audioContext, Constants.maxOrder);
+        console.log(this.sceneRotator);
+        // binaural HOA decoder
+        this.binauralDecoder = new ambisonics.binDecoder(this.audioContext, Constants.maxOrder);
+        console.log(this.binauralDecoder);
+        // intensity analyser
+        this.intensityAnalyser = new ambisonics.intensityAnalyser(this.audioContext, Constants.maxOrder);
+        console.log(this.intensityAnalyser);
+        // output gain
+        this.gainOut = this.audioContext.createGain();
+
+        // connect HOA blocks
+        this.sceneMirror.out.connect(this.sceneRotator.in);
+        this.sceneRotator.out.connect(this.orderLimiter.in);
+        this.sceneRotator.out.connect(this.intensityAnalyser.in);
+        this.orderLimiter.out.connect(this.binauralDecoder.in);
+        this.binauralDecoder.out.connect(this.gainOut);
+        this.gainOut.connect(this.audioContext.destination);
+
+        // function to assign sample to the sound buffer for playback (and enable playbutton)
+        var assignSample2SoundBuffer = function(decodedBuffer) {
+            soundBuffer = decodedBuffer;
+            (document.getElementById('play') as HTMLButtonElement).disabled = false;
+        }
+
+        // load samples and assign to buffers
+        var assignSoundBufferOnLoad = function(buffer) {
+            soundBuffer = buffer;
+            (document.getElementById('play') as HTMLButtonElement).disabled = false;
+        }
+        var loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, soundUrl, assignSoundBufferOnLoad);
+        loader_sound.load();
+
+        // load filters and assign to buffers
+        var assignFiltersOnLoad = function(buffer) {
+            this.binauralDecoder.updateFilters(buffer);
+        }
+        var loader_filters = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, irUrl_0, assignFiltersOnLoad);
+        loader_filters.load();
+
+        // function to change sample from select box
+        function changeSample() {
+            (document.getElementById('play') as HTMLButtonElement).disabled = true;
+            (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+            soundUrl = (document.getElementById("sample_no") as HTMLSelectElement).value;
+            if (typeof sound != 'undefined' && sound.isPlaying) {
+                sound.stop(0);
+                sound.isPlaying = false;
+            }
+            loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, soundUrl, assignSoundBufferOnLoad);
+            loader_sound.load();
+        }
+
+        // Define mouse drag on spatial map .png local impact
+        function mouseActionLocal(angleXY) {
+            this.sceneRotator.yaw = -angleXY[0];
+            this.sceneRotator.pitch = angleXY[1];
+            this.sceneRotator.updateRotMtx();
+        }
+
+        function drawLocal() {
+            // Update audio analyser buffers
+            this.intensityAnalyser.updateBuffers();
+            var params = this.intensityAnalyser.computeIntensity();
+            // updateCircles(params, canvas);
+        }
+
+
+        // adapt common html elements to specific example
+        document.getElementById("move-map-instructions").outerHTML='Click on the map to rotate the scene:';
+
+        // update sample list for selection
+        var sampleList = {  "orchestral 1": "sounds/HOA3_rec1.ogg",
+                            "orchestral 2": "sounds/HOA3_rec2.ogg",
+                            "orchestral 3": "sounds/HOA3_rec3.ogg",
+                            "theatrical": "sounds/HOA3_rec4.ogg"
+        };
+        var $el = document.getElementById("sample_no");
+        $el.innerHTML = ""; // remove old options
+        for (const [key, value] of Object.entries(sampleList)) {
+            console.log(`${key}: ${value}`);
+            let option = document.createElement("option");
+            option.setAttribute("value", value);
+            option.textContent = key;
+            $el.appendChild(option);
+        }
+
+        // Init event listeners
+        document.getElementById('play').addEventListener('click', function() {
+            sound = self.audioContext.createBufferSource();
+            sound.buffer = soundBuffer;
+            sound.loop = true;
+            sound.connect(self.sceneMirror.in);
+            sound.start(0);
+            sound.isPlaying = true;
+            (document.getElementById('play') as HTMLButtonElement).disabled = true;
+            (document.getElementById('stop') as HTMLButtonElement).disabled = false;
+        });
+        document.getElementById('stop').addEventListener('click', function() {
+            sound.stop(0);
+            sound.isPlaying = false;
+            (document.getElementById('play') as HTMLButtonElement).disabled = false;
+            (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+        });
+
+        // Order control buttons
+        var orderValue = document.getElementById('order-value');
+        orderValue.innerHTML = Constants.maxOrder.toString();
+        var orderButtons = document.getElementById("div-order");
+        for (let i=1; i<=Constants.maxOrder; i++) {
+            let button = document.createElement("button");
+            button.setAttribute("id", 'N'+i);
+            button.setAttribute("value", i.toString());
+            button.innerHTML = 'N'+i;
+            button.addEventListener('click', function() {
+                self.orderOut = parseInt(this.value);
+                orderValue.innerHTML = self.orderOut.toString();
+                self.orderLimiter.updateOrder(self.orderOut);
+                self.orderLimiter.out.connect(self.binauralDecoder.in);
+            });
+            orderButtons.appendChild(button);
+        }
+
+        // Decoding buttons
+        var decoderValue = document.getElementById('decoder-value');
+        var decoderButtons = document.getElementById("div-decoder");
+        var decoderStringList = ['Free-field HRIRs 1','Free-field HRIRs 2','Medium room BRIRs'];
+        decoderValue.innerHTML = decoderStringList[0];
+        var irUrlList = [irUrl_0, irUrl_1, irUrl_2];
+        for (let i=0; i<irUrlList.length; i++) {
+
+            let button = document.createElement("button");
+            button.setAttribute("id", 'R'+i);
+            button.setAttribute("value", irUrlList[i]);
+            button.innerHTML = decoderStringList[i];
+            button.addEventListener('click', function() {
+                decoderValue.innerHTML = this.innerHTML;
+                loader_filters = new ambisonics.HOAloader(self.audioContext, Constants.maxOrder, this.value, assignFiltersOnLoad);
+                loader_filters.load();
+            });
+            decoderButtons.appendChild(button);
+        }
+
+        var mirrorValue = document.getElementById('mirror-value');
+        // Mirror Buttons actions
+        for (let i=0; i<4; i++) {
+            let button = document.getElementById('M'+i) as HTMLButtonElement;
+            button.addEventListener('click', function() {
+                mirrorValue.innerHTML = this.innerHTML;
+                self.sceneMirror.mirror(parseInt(this.value));
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // 1. Prepare audio element to feed the ambisonic source audio feed.
         this.audioElement = document.createElement("audio");
@@ -89,79 +292,12 @@ export default class AudioPlayer {
         // this.merger = this.audioContext.createChannelMerger(this.audioRouteOutput.inputs);
 
         // 4.a Creates First Order Ambisonic Decoder
-        this.decoderFOA = Omnitone.createFOARenderer(this.audioContext, {
-            HRTFSetUrl: "/omnitone/build/resources/", // FuMa ordering (W,X,Y,Z).
-            ambisonicOrder: 1,
-            // postGainDB: 30,
-            // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
-            channelMap: [0, 3, 1, 2]
-        });
-        this.decoderFOA.initialize().then(() => {
-            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
-            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.ambisonicOrderNum == 0 ? "ambisonic" : "off";
-            this.decoderFOA.setRenderingMode(state);
-            this.decoderFOA.output.connect(this.audioContext.destination);
-        },
-        function (onInitializationError) {
-            console.error(onInitializationError);
-        });
+        // (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
+        // (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
+        // let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
 
-        // 4.b Creates Second Order Ambisonic Decoder
-        this.decoderSOA = Omnitone.createHOARenderer(this.audioContext, {
-            HRTFSetUrl: "/omnitone/build/resources/", // FuMa ordering (W,X,Y,Z).
-            ambisonicOrder: 2,
-            // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
-            channelMap: [0, 3, 1, 2]
-        });
-        this.decoderSOA.initialize().then(() => {
-            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
-            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
-
-            this.decoderSOA.setRenderingMode(state);
-            this.decoderSOA.output.connect(this.audioContext.destination);
-        },
-        function (onInitializationError) {
-            console.error(onInitializationError);
-        });
-
-        // 4.c Creates Third Order Ambisonic Decoder
-        this.decoderTOA = Omnitone.createHOARenderer(this.audioContext, {
-            HRTFSetUrl: "/omnitone/build/resources/", // FuMa ordering (W,X,Y,Z).
-            ambisonicOrder: 3,
-            // postGainDB: 30,
-            // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
-            channelMap: [0, 3, 1, 2]
-        });
-        this.decoderTOA.initialize().then(() => {
-            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
-            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.ambisonicOrderNum == 2 ? "ambisonic" : "off";
-
-            this.decoderTOA.setRenderingMode(state);
-            this.decoderTOA.output.connect(this.audioContext.destination);
-        },
-        function (onInitializationError) {
-            console.error(onInitializationError);
-        });
-
-        // Rotate the sound field.
-        //decoder.setRotationMatrix(rotationMatrix);
-
-        // Mono or regular multi-channel layouts.
-        //decoder.setMode('bypass');
-
-        // Ambisonically decoded audio stream.
-        //decoder.setMode('ambisonic');
-
-        // Disable encoding completely. (audio processing disabled)
-        //decoder.setMode('off');
-
-        // Creates FOA Rotator to use directly with more functions
-        var rotator = Omnitone.createFOARotator(this.audioContext);
-
-        console.log({ rotator: rotator });
+        // this.decoderSOA.setRenderingMode(state);
+        // this.decoderSOA.output.connect(this.audioContext.destination);
 
         // ========
         // Add audio file drop and selector
@@ -459,39 +595,4 @@ export default class AudioPlayer {
             this.decoderFOA.setRotationMatrix3(mtx3);
         }
     }
-
-    // listItem(item) {
-    //     let li = document.createElement("LI");
-    //     li.innerHTML = `<strong>${item.file}</strong> "${item.path}" (${item.size}) <a href="${item.path}/${item.file}">link</a> <audio src="${item.path}/${item.file}" controls="true"></audio>`;
-
-    //     if (item.description) {
-    //         li.innerHTML += `<br/><i>${item.description}</i>`;
-    //     }
-
-    //     if (item.license) {
-    //         li.innerHTML += `<p>${item.license}</p>`;
-    //     }
-
-    //     return li;
-    // }
-
-    // async getSounds() {
-    //     try {
-    //         let sounds = await fetch("soundlinks.json");
-    //         let blob = await sounds.json();
-    //         console.log(blob);
-    //         const frag = document.createDocumentFragment();
-    //         blob.forEach((item: any) => {
-    //             if (item.file != "") {
-    //                 frag.appendChild(this.listItem(item));
-    //             }
-    //         });
-
-    //         //document.getElementById("soundslist").append(frag);
-
-    //         this.links = ArrayUtil.toArray<Sound>(blob).map((x) => new Sound(x));
-    //     } catch(err) {
-    //         console.error(err);
-    //     }
-    // }
 }

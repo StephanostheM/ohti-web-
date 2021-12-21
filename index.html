@@ -24,6 +24,82 @@
 <div class="main-box">
 
     <div class="main-box-container">
+
+
+
+
+<!-- PLAY / STOP -->
+<div id='div-play-stop-buttons'>
+    <p>
+    Start / Stop audio: &nbsp;
+    <button id="play" disabled>Play</button>
+    <button id="stop" disabled>Stop</button>
+    </p>
+    </div>
+    
+    <!-- SAMPLE SELECTOR -->
+    <p>
+    Select sample:
+    <select id="sample_no" onchange="changeSample()">
+        <option value=""></option>
+    </select>
+    </p>
+    
+    <!-- AMBISONIC ORDER -->
+    <div id='div-order'>
+    <p>
+    Set Ambisonic order: <span id="order-value"></span> &nbsp;
+    </p>
+    </div>
+    
+    <!-- AMBISONIC DECODING -->
+    <div id='div-decoder'>
+    <p>
+    Set decoding filters: <span id="decoder-value"></span> &nbsp;
+    </p>
+    </div>
+    
+    <!-- OUTPUT VOLUME -->
+    <div id='div-volume'>
+    <label for="volume-slider">Volume</label> &nbsp;
+    <input id="volume-slider" type="range" min="0.1" max="10" value="1" step="0.1" />
+    </div>
+    
+    <hr>
+    
+    <!-- AMBISONIC MIRRORING -->
+    <div id='div-mirror'>
+        <p>
+        Set mirroring: <span id="mirror-value">None</span> &nbsp;
+         <button id="M0" type="button" value="0">None</button>
+         <button id="M1" type="button" value="1">Front-Back</button>
+         <button id="M2" type="button" value="2">Left-Right</button>
+         <button id="M3" type="button" value="3">Up-Down</button>
+        </p>
+    </div>
+    
+    <!-- MOVE SOURCE ON MAP -->
+    <p id='move-map-instructions'> Click on the map to pan the source: </p>
+    <p> <canvas id="Canvas" width="820" height="412"></canvas> </p>
+    <p>
+    Azimuth: <span id="azim-value">0</span>
+    Elevation: <span id="elev-value">0</span>
+    </p>
+    
+    <!-- SOUND FIELD VISUALIZER -->
+    <div id='div-analyser'>
+    <p>Intensity visualizer:</p>
+    <canvas id="Canvas2" width="820" height="412"></canvas>
+    </div>
+
+
+
+
+
+
+
+<hr/>
+
         <h3 class="ht-form--field">
             Headtracking settings and playout
         </h3>
@@ -75,7 +151,7 @@
             </div>
 
             <button id="btnToggleAudioPlayback" data-key="audio-play-button">Play</button>
-            <div class="audio-play-timer"><span data-key="status-audio-timer">0/0</span>s</div>
+            <div class="audio-play-timer"><span data-text="status-audio-timer">0/0</span>s</div>
         </div>
         <div class="ht-form--button">
             <div class="input-status-feedback">

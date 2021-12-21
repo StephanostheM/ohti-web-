@@ -13,6 +13,7 @@
   "dependencies": {
     "@microsoft/signalr": "^5.0.0",
     "@microsoft/signalr-protocol-msgpack": "^5.0.0",
+    "ambisonics": "github:Roog/JSAmbisonics",
     "hoast360": "^1.0.1",
     "omnitone": "^1.3.0",
     "three": "^0.127.0"

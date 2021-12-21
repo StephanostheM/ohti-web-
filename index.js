@@ -10,6 +10,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(404);
         res.end();
     });
+    console.log(`Requesting URL:${req.url}`);
     stream.pipe(res);
 
 })
