@@ -76,6 +76,31 @@ export default class AudioPlayerView {
         $d.event("inputCustomAudioLink", "change", (event) => {
             this.model.inputSelectAudioFile(event.target.value);
         });
+
+        $d.event("inputCustomAudioFile", "change", (event: any) => {
+            const item = (event.target as HTMLInputElement);
+            console.log("Input custom file: ", item.files[0]);
+            let file = item.files[0];
+            if (file.type.match("audio.*")) {
+                $d.om("txtLoadedAudioFile").innerText = `${file.name} (${file.type})`;
+                this.model.inputSelectAudioFile(file);
+            } else {
+                alert("Not an audio file");
+                return;
+            }
+        });
+
+        $d.event("audio-dropdown-list", "click", (event: any) => {
+            console.log("Loading selected item: ", { ev: event.target.dataset });
+
+            const links = document.querySelectorAll("[data-link]");
+            Array.from(links).forEach((element) => {
+                element.classList.remove("selected");
+            });
+            event.target.classList.add("selected");
+
+            this.model.inputSelectAudioFile(event.target.dataset.link);
+        });
     }
 
     private generateAudioFileList() {

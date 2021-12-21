@@ -163,39 +163,6 @@ export default class AudioPlayer {
 
         console.log({ rotator: rotator });
 
-        // ========
-        // Add audio file drop and selector
-        Tool.$dom("inputCustomAudioFile").onchange = function(this: HTMLInputElement) {
-            console.log("Input custom file: ", this.files[0]);
-            let file = this.files[0];
-            if (file.type.match("audio.*")) {
-                document.getElementById("txtLoadedAudioFile").innerText = `${file.name} (${file.type})`;
-                self.audioElement.src = window.URL.createObjectURL(file);
-            } else {
-                alert("Not an audio file");
-                return;
-            }
-        };
-
-        Tool.$event("audio-dropdown-list", "click", function(event) {
-            console.log("Loading selected item: ", { ev: event.target.dataset });
-            console.log({ elem: self.audioElement })
-
-            const links = document.querySelectorAll("[data-link]");
-            Array.from(links).forEach((element) => {
-                element.classList.remove("selected");
-            });
-
-            event.target.classList.add("selected");
-
-            if ("src" in (self.audioElement as HTMLAudioElement)) {
-                self.audioElement.src = event.target.dataset.link; //const mediaSource = new MediaSource();
-            } else {
-                // Avoid using this in new browsers, as it is going away.
-                self.audioElement.src = window.URL.createObjectURL(event.target.dataset.link);
-            }
-        });
-
         // Audio drop
         const drop = new AudioFileDrop();
         drop.register((source: string) => {
