@@ -97,8 +97,7 @@ export default class AudioPlayer {
             channelMap: [0, 3, 1, 2]
         });
         this.decoderFOA.initialize().then(() => {
-            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
-            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
+            this.$view.enablePlayButtons();
             let state = this.ambisonicOrderNum == 0 ? "ambisonic" : "off";
             this.decoderFOA.setRenderingMode(state);
             this.decoderFOA.output.connect(this.audioContext.destination);
@@ -115,8 +114,7 @@ export default class AudioPlayer {
             channelMap: [0, 3, 1, 2]
         });
         this.decoderSOA.initialize().then(() => {
-            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
-            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
+            this.$view.enablePlayButtons();
             let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
 
             this.decoderSOA.setRenderingMode(state);
@@ -135,8 +133,7 @@ export default class AudioPlayer {
             channelMap: [0, 3, 1, 2]
         });
         this.decoderTOA.initialize().then(() => {
-            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
-            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
+            this.$view.enablePlayButtons();
             let state = this.ambisonicOrderNum == 2 ? "ambisonic" : "off";
 
             this.decoderTOA.setRenderingMode(state);
@@ -390,16 +387,27 @@ export default class AudioPlayer {
         this.mergeChannels();
         try {
             if (this.audioElement.paused && this.audioElement.currentTime >= 0 && !this.audioElement.ended) {
-                window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: true } }) )
                 this.audioContext.resume();
                 this.audioElement.play();
             } else {
-                window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: false } }) )
                 this.audioElement.pause();
             }
         } catch(error) {
             console.error(error);
         }
+        this.$view.setAudioPlaying(this.isPlaying);
+    }
+
+    playAudio = () => {
+
+    }
+
+    stopAudio = () => {
+
+    }
+
+    private get isPlaying() {
+        return !this.audioElement.paused ?? false;
     }
 
     private get getCurrentDecoder() {

@@ -3,6 +3,7 @@ import ArrayUtil from "../utils/ArrayUtil";
 import $d from "../utils/dom-util";
 import AudioPlayer from "./AudioPlayer";
 import AudioPlayerAmbisonics from "./AudioPlayerAmbisonics";
+import Tool from '../utils/Tools';
 import * as audioSources from "../content/soundlinks.json";
 
 export default class AudioPlayerView {
@@ -35,13 +36,15 @@ export default class AudioPlayerView {
         $d.event("btnToggleAudioPlayback", "click", this.model.toggleAudioPlayback);
         $d.event("btnToggleAudioPlayer", "click", this.model.toggleAudioPlayback);
 
+        $d.event("play", "click", this.model.playAudio);
+        $d.event("stop", "click", this.model.stopAudio);
+
         // Change Ambisonic decoder
         $d.om("status-ambisonic-order").innerText = "3rd order";
         $d.event("btnToggleAmbisonicDecoderOrder", "click", this.model.toggleAmbisonicOrder);
 
         // Setting Headtrack reference
         $d.event(window, "htsetreference", (e: any) => {
-
             let dataset = document.querySelectorAll("[data-key]");
             dataset.forEach(function(item: HTMLElement) {
                 if (e.detail.hasOwnProperty("htReference")) {
@@ -58,24 +61,6 @@ export default class AudioPlayerView {
                             item.classList.remove('ht-custom-btn--reset--on');
                         } else {
                             item.classList.add('ht-custom-btn--reset--on');
-                        }
-                    }
-                }
-
-                if (e.detail.hasOwnProperty("audioPlaying")) {
-                    if (item.dataset.key === "audio-play-button-icon") {
-                        if (e.detail.audioPlaying) {
-                            item.classList.add('ht-custom-btn--audio--playing');
-                        } else {
-                            item.classList.remove('ht-custom-btn--audio--playing');
-                        }
-                    }
-
-                    if (item.dataset.key === "audio-play-button") {
-                        if (e.detail.audioPlaying) {
-                            item.textContent = 'Pause';
-                        } else {
-                            item.textContent = 'Play';
                         }
                     }
                 }
@@ -164,6 +149,45 @@ export default class AudioPlayerView {
             }
         });
         console.log(this.model.links, audioSources)
+    }
+
+    public setAudioPlaying(isPlaying: boolean) {
+        let dataset = document.querySelectorAll("[data-key]");
+        dataset.forEach(function(item: HTMLElement) {
+            if (item.dataset.key === "audio-play-button-icon") {
+                if (isPlaying) {
+                    item.classList.add('ht-custom-btn--audio--playing');
+                } else {
+                    item.classList.remove('ht-custom-btn--audio--playing');
+                }
+            }
+
+            if (item.dataset.key === "audio-play-button") {
+                if (isPlaying) {
+                    item.textContent = 'Pause';
+                } else {
+                    item.textContent = 'Play';
+                }
+            }
+        });
+
+        if (isPlaying) {
+            (document.getElementById('play') as HTMLButtonElement).disabled = true;
+            (document.getElementById('stop') as HTMLButtonElement).disabled = false;
+        } else {
+            (document.getElementById('play') as HTMLButtonElement).disabled = false;
+            (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+        }
+    }
+
+    public disablePlayButtons() {
+        (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = true;
+        (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = true;
+    }
+
+    public enablePlayButtons() {
+        (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
+        (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
     }
 
     public setOrder(ambisonicOrderNum: number) {

@@ -28,9 +28,9 @@ export default class AudioPlayerAmbisonics {
 
     private ambisonicOrderNum: number = 2;
 
-    private decoderFOA: any;
-    private decoderSOA: any;
-    private decoderTOA: any;
+    // private decoderFOA: any;
+    // private decoderSOA: any;
+    // private decoderTOA: any;
 
 
 
@@ -42,6 +42,14 @@ export default class AudioPlayerAmbisonics {
     private gainOut: any;
 
     private orderOut: number;
+
+    private soundBuffer: any;
+    private sound: any;
+
+    private soundUrl: any = "sounds/HOA3_rec1.ogg";
+
+    private loader_sound: any;
+    private loader_filters: any;
 
     private static instance: AudioPlayerAmbisonics;
     public static getInstance(): AudioPlayerAmbisonics {
@@ -68,28 +76,30 @@ export default class AudioPlayerAmbisonics {
 
         console.log(ambisonics);
 
-        var soundUrl = "sounds/HOA3_rec1.ogg";
         var irUrl_0 = "IRs/ambisonic2binaural_filters/HOA3_IRC_1008_virtual.wav";
         var irUrl_1 = "IRs/ambisonic2binaural_filters/aalto2016_N3.wav";
         var irUrl_2 = "IRs/ambisonic2binaural_filters/HOA3_BRIRs-medium.wav";
 
-        var soundBuffer, sound;
-
         // define HOA mirroring
         this.sceneMirror = new ambisonics.sceneMirror(this.audioContext, Constants.maxOrder);
-        console.log(this.sceneMirror);
+        console.log(`Scene Mirror (mirrors the sound scene of an ambisonic stream with respect to (front-back), (left-right), or (up-down) axes.):`, this.sceneMirror);
+
         // define HOA order limiter (to show the effect of order)
         this.orderLimiter = new ambisonics.orderLimiter(this.audioContext, Constants.maxOrder, this.orderOut);
-        console.log(this.orderLimiter);
+        console.log(`Order Limiter (takes a HOA stream of order N, and outputs the channel-limited HOA stream of order N'<=N):`, this.orderLimiter);
+
         // define HOA rotator
         this.sceneRotator = new ambisonics.sceneRotator(this.audioContext, Constants.maxOrder);
-        console.log(this.sceneRotator);
-        // binaural HOA decoder
+        console.log(`Scene Rotator (rotates the sound scene of an ambisonic stream, with real-time control of yaw, pitch, and roll rotation angles.):`, this.sceneRotator);
+
+        // define binaural HOA decoder
         this.binauralDecoder = new ambisonics.binDecoder(this.audioContext, Constants.maxOrder);
-        console.log(this.binauralDecoder);
-        // intensity analyser
-        this.intensityAnalyser = new ambisonics.intensityAnalyser(this.audioContext, Constants.maxOrder);
-        console.log(this.intensityAnalyser);
+        console.log(`Binaural Decoder (implements an ambisonic to binaural decoding, using user-defined HRTF-based filters. If these are not provided, two plain opposing cardioids are used instead.):`, this.binauralDecoder);
+
+        // define intensity analyser
+        this.intensityAnalyser = new ambisonics.intensityAnalyser(this.audioContext);
+        console.log(`Intensity Analyser (implements an acoustic intensity analysis for visualization of directional information captured in the ambisonic stream):`, this.intensityAnalyser);
+
         // output gain
         this.gainOut = this.audioContext.createGain();
 
@@ -101,63 +111,23 @@ export default class AudioPlayerAmbisonics {
         this.binauralDecoder.out.connect(this.gainOut);
         this.gainOut.connect(this.audioContext.destination);
 
-        // function to assign sample to the sound buffer for playback (and enable playbutton)
-        var assignSample2SoundBuffer = function(decodedBuffer) {
-            soundBuffer = decodedBuffer;
-            (document.getElementById('play') as HTMLButtonElement).disabled = false;
-        }
-
         // load samples and assign to buffers
-        var assignSoundBufferOnLoad = function(buffer) {
-            soundBuffer = buffer;
-            (document.getElementById('play') as HTMLButtonElement).disabled = false;
-        }
-        var loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, soundUrl, assignSoundBufferOnLoad);
-        loader_sound.load();
+        this.loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, this.soundUrl, this.assignSoundBufferOnLoad);
+        this.loader_sound.load();
 
         // load filters and assign to buffers
-        var assignFiltersOnLoad = function(buffer) {
-            this.binauralDecoder.updateFilters(buffer);
-        }
-        var loader_filters = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, irUrl_0, assignFiltersOnLoad);
-        loader_filters.load();
-
-        // function to change sample from select box
-        function changeSample() {
-            (document.getElementById('play') as HTMLButtonElement).disabled = true;
-            (document.getElementById('stop') as HTMLButtonElement).disabled = true;
-            soundUrl = (document.getElementById("sample_no") as HTMLSelectElement).value;
-            if (typeof sound != 'undefined' && sound.isPlaying) {
-                sound.stop(0);
-                sound.isPlaying = false;
-            }
-            loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, soundUrl, assignSoundBufferOnLoad);
-            loader_sound.load();
-        }
-
-        // Define mouse drag on spatial map .png local impact
-        function mouseActionLocal(angleXY) {
-            this.sceneRotator.yaw = -angleXY[0];
-            this.sceneRotator.pitch = angleXY[1];
-            this.sceneRotator.updateRotMtx();
-        }
-
-        function drawLocal() {
-            // Update audio analyser buffers
-            this.intensityAnalyser.updateBuffers();
-            var params = this.intensityAnalyser.computeIntensity();
-            // updateCircles(params, canvas);
-        }
-
+        this.loader_filters = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, irUrl_0, this.assignFiltersOnLoad);
+        this.loader_filters.load();
 
         // adapt common html elements to specific example
         document.getElementById("move-map-instructions").outerHTML='Click on the map to rotate the scene:';
 
         // update sample list for selection
-        var sampleList = {  "orchestral 1": "sounds/HOA3_rec1.ogg",
-                            "orchestral 2": "sounds/HOA3_rec2.ogg",
-                            "orchestral 3": "sounds/HOA3_rec3.ogg",
-                            "theatrical": "sounds/HOA3_rec4.ogg"
+        var sampleList = {
+            "orchestral 1": "sounds/HOA3_rec1.ogg",
+            "orchestral 2": "sounds/HOA3_rec2.ogg",
+            "orchestral 3": "sounds/HOA3_rec3.ogg",
+            "theatrical": "sounds/HOA3_rec4.ogg"
         };
         var $el = document.getElementById("sample_no");
         $el.innerHTML = ""; // remove old options
@@ -170,22 +140,23 @@ export default class AudioPlayerAmbisonics {
         }
 
         // Init event listeners
-        document.getElementById('play').addEventListener('click', function() {
-            sound = self.audioContext.createBufferSource();
-            sound.buffer = soundBuffer;
-            sound.loop = true;
-            sound.connect(self.sceneMirror.in);
-            sound.start(0);
-            sound.isPlaying = true;
-            (document.getElementById('play') as HTMLButtonElement).disabled = true;
-            (document.getElementById('stop') as HTMLButtonElement).disabled = false;
-        });
-        document.getElementById('stop').addEventListener('click', function() {
-            sound.stop(0);
-            sound.isPlaying = false;
-            (document.getElementById('play') as HTMLButtonElement).disabled = false;
-            (document.getElementById('stop') as HTMLButtonElement).disabled = true;
-        });
+
+        // document.getElementById('play').addEventListener('click', () => {
+        //     this.sound = self.audioContext.createBufferSource();
+        //     this.sound.buffer = this.soundBuffer;
+        //     this.sound.loop = true;
+        //     this.sound.connect(self.sceneMirror.in);
+        //     this.sound.start(0);
+        //     this.sound.isPlaying = true;
+        //     (document.getElementById('play') as HTMLButtonElement).disabled = true;
+        //     (document.getElementById('stop') as HTMLButtonElement).disabled = false;
+        // });
+        // document.getElementById('stop').addEventListener('click', () => {
+        //     this.sound.stop(0);
+        //     this.sound.isPlaying = false;
+        //     (document.getElementById('play') as HTMLButtonElement).disabled = false;
+        //     (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+        // });
 
         // Order control buttons
         var orderValue = document.getElementById('order-value');
@@ -212,21 +183,20 @@ export default class AudioPlayerAmbisonics {
         decoderValue.innerHTML = decoderStringList[0];
         var irUrlList = [irUrl_0, irUrl_1, irUrl_2];
         for (let i=0; i<irUrlList.length; i++) {
-
             let button = document.createElement("button");
             button.setAttribute("id", 'R'+i);
             button.setAttribute("value", irUrlList[i]);
             button.innerHTML = decoderStringList[i];
-            button.addEventListener('click', function() {
-                decoderValue.innerHTML = this.innerHTML;
-                loader_filters = new ambisonics.HOAloader(self.audioContext, Constants.maxOrder, this.value, assignFiltersOnLoad);
-                loader_filters.load();
+            button.addEventListener('click', () => {
+                decoderValue.innerHTML = button.innerHTML;
+                this.loader_filters = new ambisonics.HOAloader(self.audioContext, Constants.maxOrder, button.value, this.assignFiltersOnLoad);
+                this.loader_filters.load();
             });
             decoderButtons.appendChild(button);
         }
 
-        var mirrorValue = document.getElementById('mirror-value');
         // Mirror Buttons actions
+        var mirrorValue = document.getElementById('mirror-value');
         for (let i=0; i<4; i++) {
             let button = document.getElementById('M'+i) as HTMLButtonElement;
             button.addEventListener('click', function() {
@@ -257,54 +227,41 @@ export default class AudioPlayerAmbisonics {
 
 
         // 1. Prepare audio element to feed the ambisonic source audio feed.
-        this.audioElement = document.createElement("audio");
-        this.audioElement.loop = true;
-        this.audioElement.crossOrigin = "anonymous";
-        this.audioElement.src = audioSources[3]["file"];
-        this.audioElement.volume = 1;
-        this.audioElement.controls = true;
+        // this.audioElement = document.createElement("audio");
+        // this.audioElement.loop = true;
+        // this.audioElement.crossOrigin = "anonymous";
+        // this.audioElement.src = audioSources[3]["file"];
+        // this.audioElement.volume = 1;
+        // this.audioElement.controls = true;
 
-        this.audioElement.ontimeupdate = function(event) {
-            const track = event.target as HTMLAudioElement;
-            self.$view.setAudioTimer(track.duration, track.currentTime);
-        }
+        // this.audioElement.ontimeupdate = function(event) {
+        //     const track = event.target as HTMLAudioElement;
+        //     self.$view.setAudioTimer(track.duration, track.currentTime);
+        // }
 
-        this.audioElement.onloadedmetadata = function() {
-            self.audioElement.setAttribute("duration", self.audioElement.duration.toString());
-            self.$view.setAudioTimer(self.audioElement.duration, self.audioElement.currentTime);
-        }
+        // this.audioElement.onloadedmetadata = function() {
+        //     self.audioElement.setAttribute("duration", self.audioElement.duration.toString());
+        //     self.$view.setAudioTimer(self.audioElement.duration, self.audioElement.currentTime);
+        // }
 
-        console.log({ element: this.audioElement });
+        // console.log({ element: this.audioElement });
 
-        document.getElementById("audioPlayerContainer").append(this.audioElement);
+        // document.getElementById("audioPlayerContainer").append(this.audioElement);
 
-        // 2. Create media element source
-        this.audioElementSource = this.audioContext.createMediaElementSource(this.audioElement);
+        // // 2. Create media element source
+        // this.audioElementSource = this.audioContext.createMediaElementSource(this.audioElement);
 
-        // 3. Create gain node
-        this.audioInputGain = this.audioContext.createGain();
-        this.audioElementSource.connect(this.audioInputGain);
+        // // 3. Create gain node
+        // this.audioInputGain = this.audioContext.createGain();
+        // this.audioElementSource.connect(this.audioInputGain);
 
-        // 4. Create the audio routing
-        // this.splitter = this.audioContext.createChannelSplitter(this.audioRouteOutput.outputs);
-        // this.audioInputGain.connect(this.splitter);
-        // this.merger = this.audioContext.createChannelMerger(this.audioRouteOutput.inputs);
+        // // Audio drop
+        // const drop = new AudioFileDrop();
+        // drop.register((source: string) => {
+        //     this.audioElement.src = source;
+        // });
 
-        // 4.a Creates First Order Ambisonic Decoder
-        // (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
-        // (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-        // let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
-
-        // this.decoderSOA.setRenderingMode(state);
-        // this.decoderSOA.output.connect(this.audioContext.destination);
-
-        // Audio drop
-        const drop = new AudioFileDrop();
-        drop.register((source: string) => {
-            this.audioElement.src = source;
-        });
-
-        this.generateChannelSelector();
+        //this.generateChannelSelector();
 
         // Bind events to channel matrix selector
         Tool.$event("channel-selector", "click", (event: any) => {
@@ -320,9 +277,6 @@ export default class AudioPlayerAmbisonics {
                 } catch(error) {
                     console.error(error);
                 }
-                // this.getCurrentDecoder().input.disconnect();
-                // this.audioContext.resume();
-                // this.audioElement.play();
                 this.mergeChannels();
             }
         });
@@ -356,6 +310,50 @@ export default class AudioPlayerAmbisonics {
                 }
             });
         });
+    }
+
+    // Define mouse drag on spatial map .png local impact
+    public mouseActionLocal(angleXY) {
+        this.sceneRotator.yaw = -angleXY[0];
+        this.sceneRotator.pitch = angleXY[1];
+        this.sceneRotator.updateRotMtx();
+    }
+
+    public drawLocal() {
+        // Update audio analyser buffers
+        this.intensityAnalyser.updateBuffers();
+        var params = this.intensityAnalyser.computeIntensity();
+        // updateCircles(params, canvas);
+    }
+
+    // function to change sample from select box
+    public changeSample() {
+        (document.getElementById('play') as HTMLButtonElement).disabled = true;
+        (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+        this.soundUrl = (document.getElementById("sample_no") as HTMLSelectElement).value;
+        if (typeof this.sound != 'undefined' && this.sound.isPlaying) {
+            this.sound.stop(0);
+            this.sound.isPlaying = false;
+        }
+        this.loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, this.soundUrl, this.assignSoundBufferOnLoad);
+        this.loader_sound.load();
+    }
+
+    // function to assign sample to the sound buffer for playback (and enable playbutton)
+    // public assignSample2SoundBuffer = (decodedBuffer) => {
+    //     this.soundBuffer = decodedBuffer;
+    //     (document.getElementById('play') as HTMLButtonElement).disabled = false;
+    // }
+
+    // load samples and assign to buffers
+    public assignSoundBufferOnLoad = (buffer) => {
+        this.soundBuffer = buffer;
+        (document.getElementById('play') as HTMLButtonElement).disabled = false;
+    }
+
+    // load filters and assign to buffers
+    public assignFiltersOnLoad = (buffer) => {
+        this.binauralDecoder.updateFilters(buffer);
     }
 
     public inputSelectAudioFile = (audio) => {
@@ -488,11 +486,11 @@ export default class AudioPlayerAmbisonics {
             });
             console.log("Splitter   :", splitter);
             console.log("Merger     :", merger);
-            console.log("Decoder in :", this.getCurrentDecoder.input);
-            console.log("Decoder out:", this.getCurrentDecoder.output);
+            // console.log("Decoder in :", this.getCurrentDecoder.input);
+            // console.log("Decoder out:", this.getCurrentDecoder.output);
 
             // Out from Omnitone decoder, send toaudio context
-            merger.connect(this.getCurrentDecoder.input);
+            merger.connect(this.getCurrentDecoder.input); // TODO: find decodet in jsambisonics
 
             console.log(`AudioContext state '${this.audioContext.state}'`)
 
@@ -504,18 +502,15 @@ export default class AudioPlayerAmbisonics {
     toggleAmbisonicOrder = (event) => {
         this.ambisonicOrderNum = (this.ambisonicOrderNum+1)%3;
         if (this.ambisonicOrderNum == 2) {
-            this.decoderFOA.setRenderingMode("off")
-            this.decoderSOA.setRenderingMode("off");
-            this.decoderTOA.setRenderingMode("ambisonic");
+            this.orderOut = 3;
         } else if (this.ambisonicOrderNum == 1) {
-            this.decoderFOA.setRenderingMode("off")
-            this.decoderSOA.setRenderingMode("ambisonic");
-            this.decoderTOA.setRenderingMode("off");
+            this.orderOut = 2;
         } else {
-            this.decoderFOA.setRenderingMode("ambisonic")
-            this.decoderSOA.setRenderingMode("off");
-            this.decoderTOA.setRenderingMode("off");
+            this.orderOut = 1;
         }
+        console.log("toggle-ambisonics-order =", this.orderOut);
+        this.orderLimiter.updateOrder(this.orderOut);
+        this.orderLimiter.out.connect(this.binauralDecoder.in);
 
         this.$view.setOrder(this.ambisonicOrderNum);
     }
@@ -525,16 +520,41 @@ export default class AudioPlayerAmbisonics {
         this.mergeChannels();
         try {
             if (this.audioElement.paused && this.audioElement.currentTime >= 0 && !this.audioElement.ended) {
-                window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: true } }) )
                 this.audioContext.resume();
                 this.audioElement.play();
             } else {
-                window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: false } }) )
                 this.audioElement.pause();
             }
         } catch(error) {
             console.error(error);
         }
+        this.$view.setAudioPlaying(this.isPlaying);
+    }
+
+    playAudio = () => {
+        try {
+        this.sound = this.audioContext.createBufferSource();
+        this.sound.buffer = this.soundBuffer;
+        this.sound.loop = true;
+        this.sound.connect(this.sceneMirror.in);
+        this.sound.start(0);
+        this.sound.isPlaying = true;
+        this.$view.setAudioPlaying(true);
+        } catch(err) {
+            console.error(err);
+        }
+        console.log("play audio");
+    }
+
+    stopAudio = () => {
+        this.sound.stop(0);
+        this.sound.isPlaying = false;
+        this.$view.setAudioPlaying(false);
+        console.log("stop audio");
+    }
+
+    private get isPlaying() {
+        return !this.audioElement.paused ?? false;
     }
 
     private get getCurrentDecoder() {
