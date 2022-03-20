@@ -6,18 +6,40 @@ declare module 'ambisonics' {
     export class orderLimiter {
         constructor(audioCtx: any, orderIn: number, orderOut: number);
 
-        updateOrder(orderOut);
+        updateOrder(orderOut: number);
     }
 
     /**
      * Rotates the sound scene of an ambisonic stream, with real-time control of yaw, pitch, and roll rotation angles.
      */
     export class sceneRotator {
+
+        /** Browser audio context */
+        public ctx: AudioContext;
+        /** Ambisonics order */
+        public order: number;
+        /** Number of channels, based on (order+1)*(order+1) */
+        public nCh: number;
+        /** Channel splitter in */
+        public in: ChannelSplitterNode;
+        /** Stereo channel merger out */
+        public out: ChannelMergerNode;
+        /**  */
+        public yaw: number;
+        /**  */
+        public pitch: number;
+        /**  */
+        public roll: number;
+        /**  */
+        public rotMtx: any;
+        /**  */
+        public rotMtxNodes: any[];
+
         constructor(audioCtx: any, order: number);
 
         /**
          * Updates the matrix for rotating from the 'yaw', 'pitch' and 'roll' parameters.
-         * Make sure you update these values first before running this.
+         * Make sure you update these values first before running this. The parameters should be set in degrees.
          */
         updateRotMtx();
     }
@@ -48,7 +70,22 @@ declare module 'ambisonics' {
      * Binaural Decoder HOA implements an ambisonic to binaural decoding, using user-defined HRTF-based filters. If these are not provided, two plain opposing cardioids are used instead.
      */
     export class binDecoder {
-        constructor(audioCtx: any, order: any);
+        /** Indicates if the decoder has been initialized */
+        public initialized: boolean;
+        /** Browser audio context */
+        public ctx: AudioContext;
+        /** Ambisonics order */
+        public order: number;
+        /** Number of channels, based on (order+1)*(order+1) */
+        public nCh: number;
+        /** Channel splitter in */
+        public in: ChannelSplitterNode;
+        /** Stereo channel merger out */
+        public out: ChannelMergerNode;
+        /** Audio context convolver nodes */
+        public decFilterNodes: any[];
+
+        constructor(audioCtx: any, order: number);
 
         updateFilters(...val: any);
 

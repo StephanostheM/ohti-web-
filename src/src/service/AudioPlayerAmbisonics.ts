@@ -11,6 +11,9 @@ import * as ambisonics from "ambisonics";
 import AudioPlayerView from "./AudioPlayerView";
 import * as audioSources from "../content/soundlinks.json";
 import Constants from '../utils/Constants';
+import { RowMajorMatrix3x3 } from '../models/RowMajorMatrix3x3';
+import { IEulerAngles } from '../models/IEulerAngles';
+import QuaternionTools from '../utils/QuaternionTools';
 
 export default class AudioPlayerAmbisonics {
     private $view: AudioPlayerView;
@@ -36,7 +39,7 @@ export default class AudioPlayerAmbisonics {
 
     private sceneMirror: any;
     private orderLimiter: any;
-    private sceneRotator: any;
+    private sceneRotator: ambisonics.sceneRotator;
     private binauralDecoder: any;
     private intensityAnalyser: any;
     private gainOut: any;
@@ -490,7 +493,7 @@ export default class AudioPlayerAmbisonics {
             // console.log("Decoder out:", this.getCurrentDecoder.output);
 
             // Out from Omnitone decoder, send toaudio context
-            merger.connect(this.getCurrentDecoder.input); // TODO: find decodet in jsambisonics
+            // merger.connect(this.getCurrentDecoder.input); // TODO: find decodet in jsambisonics
 
             console.log(`AudioContext state '${this.audioContext.state}'`)
 
@@ -558,27 +561,26 @@ export default class AudioPlayerAmbisonics {
     }
 
     private get getCurrentDecoder() {
-        if (this.ambisonicOrderNum == 2) {
-            return this.decoderTOA;
-        } else if (this.ambisonicOrderNum == 1) {
-            return this.decoderSOA;
-        } else {
-            return this.decoderFOA;
-        }
+        // if (this.ambisonicOrderNum == 2) {
+        //     return this.decoderTOA;
+        // } else if (this.ambisonicOrderNum == 1) {
+        //     return this.decoderSOA;
+        // } else {
+        //     return this.decoderFOA;
+        // }
+        return 3;
     }
 
     /**
-     * Omnitone uses 3x3 row-major matrix to rotate the sound field.
+     * JSAmbisonics uses euler to rotate field.
      * @param mtx3 3x3 row major matrix
      * @param euler null
      */
-    public rotateSoundField(mtx3: any, euler: any = null) {
-        if (this.ambisonicOrderNum == 2) {
-            this.decoderTOA.setRotationMatrix3(mtx3);
-        } else if (this.ambisonicOrderNum == 1) {
-            this.decoderSOA.setRotationMatrix3(mtx3);
-        } else {
-            this.decoderFOA.setRotationMatrix3(mtx3);
-        }
+    public rotateSoundField(mtx3: RowMajorMatrix3x3, euler: IEulerAngles = null) {
+        this.sceneRotator.roll = QuaternionTools.radiansToDegrees(euler.x);
+        this.sceneRotator.pitch = QuaternionTools.radiansToDegrees(euler.y);
+        this.sceneRotator.yaw = QuaternionTools.radiansToDegrees(euler.z);
+        this.sceneRotator.updateRotMtx();
+        console.log(euler);
     }
 }

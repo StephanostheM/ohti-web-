@@ -87,7 +87,13 @@ export default class QuaternionTools {
         return a;
     }
 
-    public static toEuler(q, degrees) {
+    /**
+     * 
+     * @param q array with quarternions, [W, X, Y, Z]
+     * @param degrees if you want the return format to be in degrees instead of radians
+     * @returns { roll: number; pitch: number; yaw: number; }
+     */
+    public static toEuler(q, degrees: boolean = false) {
         // TODO: Rename and reformat before use
         // Conversion between Quarternions and Euler angles
         // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

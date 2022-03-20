@@ -10,6 +10,8 @@ import { AudioMatrixRoute } from "./AudioMatrixRoute";
 import DOMUtil from "../utils/DOMUtil";
 import AudioFileDrop from "./AudioFileDrop";
 import AudioPlayerView from "./AudioPlayerView";
+import { RowMajorMatrix3x3 } from "../models/RowMajorMatrix3x3";
+import { IEulerAngles } from "../models/IEulerAngles";
 
 export default class AudioPlayer {
     private $view: AudioPlayerView;
@@ -353,7 +355,7 @@ export default class AudioPlayer {
             console.log("Decoder in :", this.getCurrentDecoder.input);
             console.log("Decoder out:", this.getCurrentDecoder.output);
 
-            // Out from Omnitone decoder, send toaudio context
+            // Out from Omnitone decoder, send to audio context
             merger.connect(this.getCurrentDecoder.input);
 
             console.log(`AudioContext state '${this.audioContext.state}'`)
@@ -425,7 +427,7 @@ export default class AudioPlayer {
      * @param mtx3 3x3 row major matrix
      * @param euler null
      */
-    public rotateSoundField(mtx3: any, euler: any = null) {
+    public rotateSoundField(mtx3: RowMajorMatrix3x3, euler: IEulerAngles = null) {
         if (this.ambisonicOrderNum == 2) {
             this.decoderTOA.setRotationMatrix3(mtx3);
         } else if (this.ambisonicOrderNum == 1) {
