@@ -1,0 +1,26 @@
+[
+    {
+        "name": "orchestral 1",
+        "file": "HOA3_rec1.ogg",
+        "path": "sounds",
+        "ambiorder": "3rd"
+    },
+    {
+        "name": "orchestral 2",
+        "file": "HOA3_rec2.ogg",
+        "path": "sounds",
+        "ambiorder": "3rd"
+    },
+    {
+        "name": "orchestral 3",
+        "file": "HOA3_rec3.ogg",
+        "path": "sounds",
+        "ambiorder": "3rd"
+    },
+    {
+        "name": "theatrical",
+        "file": "HOA3_rec4.ogg",
+        "path": "sounds",
+        "ambiorder": "3rd"
+    }
+]

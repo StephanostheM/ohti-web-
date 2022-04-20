@@ -21,7 +21,7 @@ export default class AudioPlayerView {
 
     private fetchAudioList() {
         console.log("######");
-        fetch("mediafiles.json").then((data) => data.json()).then((result) => {
+        fetch("static/mediafiles.json").then((data) => data.json()).then((result) => {
             console.error("=============")
             console.log(result);
             this.generateFileList(result);
@@ -113,7 +113,7 @@ export default class AudioPlayerView {
             let option = document.createElement("option");
             option.setAttribute("id", `R-${audio.file}`);
             option.setAttribute("value", `../${audio.path}/${audio.file}`);
-            option.text = audio.file;
+            option.text = audio.displayName;
             selectListOfAudioFiles.appendChild(option);
 
             let liitem = document.createElement("li");

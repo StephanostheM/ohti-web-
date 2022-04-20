@@ -15,7 +15,7 @@ export default class Sound {
 
     constructor(data: any) {
         if (data) {
-            this.displayName = data.file;
+            this.displayName = data.name || data.file;
             this.file = data.file;
             this.path = data.path;
             this.size = data.size;
@@ -30,8 +30,8 @@ export default class Sound {
     public static FromMedia(data: any): Sound {
         let sound = new Sound(null);
         sound.displayName = data.name;
-        sound.file = data.filename;
-        sound.path = "Media";
+        sound.file = data.file || data.filename;
+        sound.path = data.path || "/";
         sound.format = data.format;
         sound.channel_order = data.kind;
 

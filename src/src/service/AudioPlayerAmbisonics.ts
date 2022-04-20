@@ -125,23 +125,6 @@ export default class AudioPlayerAmbisonics {
         // adapt common html elements to specific example
         document.getElementById("move-map-instructions").outerHTML='Click on the map to rotate the scene:';
 
-        // update sample list for selection
-        var sampleList = {
-            "orchestral 1": "sounds/HOA3_rec1.ogg",
-            "orchestral 2": "sounds/HOA3_rec2.ogg",
-            "orchestral 3": "sounds/HOA3_rec3.ogg",
-            "theatrical": "sounds/HOA3_rec4.ogg"
-        };
-        var $el = document.getElementById("sample_no");
-        $el.innerHTML = ""; // remove old options
-        for (const [key, value] of Object.entries(sampleList)) {
-            console.log(`${key}: ${value}`);
-            let option = document.createElement("option");
-            option.setAttribute("value", value);
-            option.textContent = key;
-            $el.appendChild(option);
-        }
-
         // Init event listeners
 
         // document.getElementById('play').addEventListener('click', () => {
@@ -280,7 +263,7 @@ export default class AudioPlayerAmbisonics {
                 } catch(error) {
                     console.error(error);
                 }
-                this.mergeChannels();
+                //this.mergeChannels();
             }
         });
 
@@ -330,17 +313,17 @@ export default class AudioPlayerAmbisonics {
     }
 
     // function to change sample from select box
-    public changeSample() {
-        (document.getElementById('play') as HTMLButtonElement).disabled = true;
-        (document.getElementById('stop') as HTMLButtonElement).disabled = true;
-        this.soundUrl = (document.getElementById("sample_no") as HTMLSelectElement).value;
-        if (typeof this.sound != 'undefined' && this.sound.isPlaying) {
-            this.sound.stop(0);
-            this.sound.isPlaying = false;
-        }
-        this.loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, this.soundUrl, this.assignSoundBufferOnLoad);
-        this.loader_sound.load();
-    }
+    // public changeSample() {
+    //     (document.getElementById('play') as HTMLButtonElement).disabled = true;
+    //     (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+    //     this.soundUrl = (document.getElementById("sample_no") as HTMLSelectElement).value;
+    //     if (typeof this.sound != 'undefined' && this.sound.isPlaying) {
+    //         this.sound.stop(0);
+    //         this.sound.isPlaying = false;
+    //     }
+    //     this.loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, this.soundUrl, this.assignSoundBufferOnLoad);
+    //     this.loader_sound.load();
+    // }
 
     // function to assign sample to the sound buffer for playback (and enable playbutton)
     // public assignSample2SoundBuffer = (decodedBuffer) => {
@@ -348,26 +331,36 @@ export default class AudioPlayerAmbisonics {
     //     (document.getElementById('play') as HTMLButtonElement).disabled = false;
     // }
 
-    // load samples and assign to buffers
+    // load samples and assign to audio buffers
     public assignSoundBufferOnLoad = (buffer) => {
         this.soundBuffer = buffer;
-        (document.getElementById('play') as HTMLButtonElement).disabled = false;
+        // (document.getElementById('play') as HTMLButtonElement).disabled = false;
     }
 
-    // load filters and assign to buffers
+    // load filters and assign to filter buffers
     public assignFiltersOnLoad = (buffer) => {
         this.binauralDecoder.updateFilters(buffer);
     }
 
     public inputSelectAudioFile = (audio) => {
         console.log("Loading selected item: ", audio);
-        console.log({ elem: this.audioElement })
-        if ("src" in (this.audioElement as HTMLAudioElement)) {
-            this.audioElement.src = audio; //const mediaSource = new MediaSource();
-        } else {
-            // Avoid using this in new browsers, as it is going away.
-            this.audioElement.src = window.URL.createObjectURL(audio);
+        // console.log({ elem: this.audioElement })
+        // if ("src" in (this.audioElement as HTMLAudioElement)) {
+        //     this.audioElement.src = audio; //const mediaSource = new MediaSource();
+        // } else {
+        //     // Avoid using this in new browsers, as it is going away.
+        //     this.audioElement.src = window.URL.createObjectURL(audio);
+        // }
+
+        (document.getElementById('play') as HTMLButtonElement).disabled = true;
+        (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+        this.soundUrl = audio;
+        if (typeof this.sound != 'undefined' && this.sound.isPlaying) {
+            this.sound.stop(0);
+            this.sound.isPlaying = false;
         }
+        this.loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, this.soundUrl, this.assignSoundBufferOnLoad);
+        this.loader_sound.load();
     };
 
     /**
@@ -430,7 +423,7 @@ export default class AudioPlayerAmbisonics {
         DOMUtil.removeAllChildNodes(container);
         container.appendChild(group);
 
-        this.mergeChannels();
+        //this.mergeChannels();
     }
 
     private lastSplitter: any = null;
@@ -519,37 +512,43 @@ export default class AudioPlayerAmbisonics {
     }
 
     toggleAudioPlayback = (event) => {
-        console.log(this)
-        this.mergeChannels();
-        try {
-            if (this.audioElement.paused && this.audioElement.currentTime >= 0 && !this.audioElement.ended) {
-                this.audioContext.resume();
-                this.audioElement.play();
-            } else {
-                this.audioElement.pause();
-            }
-        } catch(error) {
-            console.error(error);
+        // console.log(this)
+        // //this.mergeChannels();
+        // try {
+        //     if (this.audioElement.paused && this.audioElement.currentTime >= 0 && !this.audioElement.ended) {
+        //         this.audioContext.resume();
+        //         this.audioElement.play();
+        //     } else {
+        //         this.audioElement.pause();
+        //     }
+        // } catch(error) {
+        //     console.error(error);
+        // }
+        // this.$view.setAudioPlaying(this.isPlaying);
+
+        if (this.sound?.isPlaying) {
+            this.stopAudio();
+        } else {
+            this.playAudio();
         }
-        this.$view.setAudioPlaying(this.isPlaying);
     }
 
-    playAudio = () => {
+    public playAudio = () => {
         try {
-        this.sound = this.audioContext.createBufferSource();
-        this.sound.buffer = this.soundBuffer;
-        this.sound.loop = true;
-        this.sound.connect(this.sceneMirror.in);
-        this.sound.start(0);
-        this.sound.isPlaying = true;
-        this.$view.setAudioPlaying(true);
+            this.sound = this.audioContext.createBufferSource();
+            this.sound.buffer = this.soundBuffer;
+            this.sound.loop = true;
+            this.sound.connect(this.sceneMirror.in);
+            this.sound.start(0);
+            this.sound.isPlaying = true;
+            this.$view.setAudioPlaying(true);
         } catch(err) {
             console.error(err);
         }
         console.log("play audio");
     }
 
-    stopAudio = () => {
+    public stopAudio = () => {
         this.sound.stop(0);
         this.sound.isPlaying = false;
         this.$view.setAudioPlaying(false);
