@@ -22,5 +22,11 @@
         "file": "HOA3_rec4.ogg",
         "path": "sounds",
         "ambiorder": "3rd"
+    },
+    {
+        "name": "Gaudete-256k AMB8 dashinit",
+        "file": "Gaudete-256k_AMB8_dashinit.mp4",
+        "path": "sounds",
+        "ambiorder": "3rd"
     }
 ]

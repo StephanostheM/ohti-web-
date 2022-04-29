@@ -301,7 +301,7 @@ export default class AudioPlayer {
     /**
      * Creates a channel splitter, reroutes and channel merger
      */
-    mergeChannels() {
+    private mergeChannels() {
         try {
             console.log("gain", this.audioInputGain)
             const splitter = this.audioContext.createChannelSplitter(this.audioRouteOutput.outputs); // out 10
@@ -365,7 +365,7 @@ export default class AudioPlayer {
         }
     }
 
-    toggleAmbisonicOrder = (event) => {
+    public toggleAmbisonicOrder = (event) => {
         this.ambisonicOrderNum = (this.ambisonicOrderNum+1)%3;
         if (this.ambisonicOrderNum == 2) {
             this.decoderFOA.setRenderingMode("off")
@@ -384,7 +384,7 @@ export default class AudioPlayer {
         this.$view.setOrder(this.ambisonicOrderNum);
     }
 
-    toggleAudioPlayback = (event) => {
+    public toggleAudioPlayback = (event) => {
         console.log(this)
         this.mergeChannels();
         try {

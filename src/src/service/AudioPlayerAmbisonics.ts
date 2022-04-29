@@ -109,7 +109,7 @@ export default class AudioPlayerAmbisonics {
         // connect HOA blocks
         this.sceneMirror.out.connect(this.sceneRotator.in);
         this.sceneRotator.out.connect(this.orderLimiter.in);
-        this.sceneRotator.out.connect(this.intensityAnalyser.in);
+        // this.sceneRotator.out.connect(this.intensityAnalyser.in);
         this.orderLimiter.out.connect(this.binauralDecoder.in);
         this.binauralDecoder.out.connect(this.gainOut);
         this.gainOut.connect(this.audioContext.destination);
@@ -124,25 +124,6 @@ export default class AudioPlayerAmbisonics {
 
         // adapt common html elements to specific example
         document.getElementById("move-map-instructions").outerHTML='Click on the map to rotate the scene:';
-
-        // Init event listeners
-
-        // document.getElementById('play').addEventListener('click', () => {
-        //     this.sound = self.audioContext.createBufferSource();
-        //     this.sound.buffer = this.soundBuffer;
-        //     this.sound.loop = true;
-        //     this.sound.connect(self.sceneMirror.in);
-        //     this.sound.start(0);
-        //     this.sound.isPlaying = true;
-        //     (document.getElementById('play') as HTMLButtonElement).disabled = true;
-        //     (document.getElementById('stop') as HTMLButtonElement).disabled = false;
-        // });
-        // document.getElementById('stop').addEventListener('click', () => {
-        //     this.sound.stop(0);
-        //     this.sound.isPlaying = false;
-        //     (document.getElementById('play') as HTMLButtonElement).disabled = false;
-        //     (document.getElementById('stop') as HTMLButtonElement).disabled = true;
-        // });
 
         // Order control buttons
         var orderValue = document.getElementById('order-value');
@@ -312,33 +293,15 @@ export default class AudioPlayerAmbisonics {
         // updateCircles(params, canvas);
     }
 
-    // function to change sample from select box
-    // public changeSample() {
-    //     (document.getElementById('play') as HTMLButtonElement).disabled = true;
-    //     (document.getElementById('stop') as HTMLButtonElement).disabled = true;
-    //     this.soundUrl = (document.getElementById("sample_no") as HTMLSelectElement).value;
-    //     if (typeof this.sound != 'undefined' && this.sound.isPlaying) {
-    //         this.sound.stop(0);
-    //         this.sound.isPlaying = false;
-    //     }
-    //     this.loader_sound = new ambisonics.HOAloader(this.audioContext, Constants.maxOrder, this.soundUrl, this.assignSoundBufferOnLoad);
-    //     this.loader_sound.load();
-    // }
-
     // function to assign sample to the sound buffer for playback (and enable playbutton)
-    // public assignSample2SoundBuffer = (decodedBuffer) => {
-    //     this.soundBuffer = decodedBuffer;
-    //     (document.getElementById('play') as HTMLButtonElement).disabled = false;
-    // }
-
     // load samples and assign to audio buffers
-    public assignSoundBufferOnLoad = (buffer) => {
+    private assignSoundBufferOnLoad = (buffer) => {
         this.soundBuffer = buffer;
         // (document.getElementById('play') as HTMLButtonElement).disabled = false;
     }
 
     // load filters and assign to filter buffers
-    public assignFiltersOnLoad = (buffer) => {
+    private assignFiltersOnLoad = (buffer) => {
         this.binauralDecoder.updateFilters(buffer);
     }
 
@@ -352,8 +315,8 @@ export default class AudioPlayerAmbisonics {
         //     this.audioElement.src = window.URL.createObjectURL(audio);
         // }
 
-        (document.getElementById('play') as HTMLButtonElement).disabled = true;
-        (document.getElementById('stop') as HTMLButtonElement).disabled = true;
+        // (document.getElementById('play') as HTMLButtonElement).disabled = true;
+        // (document.getElementById('stop') as HTMLButtonElement).disabled = true;
         this.soundUrl = audio;
         if (typeof this.sound != 'undefined' && this.sound.isPlaying) {
             this.sound.stop(0);
@@ -431,11 +394,11 @@ export default class AudioPlayerAmbisonics {
     /**
      * Creates a channel splitter, reroutes and channel merger
      */
-    mergeChannels() {
+    private mergeChannels() {
         try {
             console.log("gain", this.audioInputGain)
             const splitter = this.audioContext.createChannelSplitter(this.audioRouteOutput.outputs); // out 10
-            //this.audioElementSource.connect(splitter); // mediaElemSource is video or audio element
+
             if (this.lastSplitter !== null) {
                 this.audioInputGain.disconnect(this.lastSplitter);
             }
@@ -468,14 +431,6 @@ export default class AudioPlayerAmbisonics {
                     silence.start(0);
                     console.log("Silence ch count:", silence.channelCount, ",in=", silence.numberOfInputs, "out=", silence.numberOfOutputs);
 
-                    // const source3 = this.audioContext.createOscillator();
-                    // source3.frequency.value = 440;
-                    // const volume = this.audioContext.createGain();
-                    // volume.gain.value = -1;
-                    // source3.connect(volume);
-                    // volume.connect(merger, 0, outIndex);
-                    // source3.start(0);
-
                     // splitter.connect(merger, outIndex, this.audioRouteOutput.outputs - 1);
                     console.log(`Route: input ${this.audioRouteOutput.outputs} => ${outIndex+1} (fake silent input)`);
                 }
@@ -495,7 +450,7 @@ export default class AudioPlayerAmbisonics {
         }
     }
 
-    toggleAmbisonicOrder = (event) => {
+    public toggleAmbisonicOrder = (event) => {
         this.ambisonicOrderNum = (this.ambisonicOrderNum+1)%3;
         if (this.ambisonicOrderNum == 2) {
             this.orderOut = 3;
@@ -511,7 +466,7 @@ export default class AudioPlayerAmbisonics {
         this.$view.setOrder(this.ambisonicOrderNum);
     }
 
-    toggleAudioPlayback = (event) => {
+    public toggleAudioPlayback = (event) => {
         // console.log(this)
         // //this.mergeChannels();
         // try {
@@ -542,6 +497,8 @@ export default class AudioPlayerAmbisonics {
             this.sound.start(0);
             this.sound.isPlaying = true;
             this.$view.setAudioPlaying(true);
+                    //     (document.getElementById('play') as HTMLButtonElement).disabled = true;
+        //     (document.getElementById('stop') as HTMLButtonElement).disabled = false;
         } catch(err) {
             console.error(err);
         }
@@ -553,6 +510,8 @@ export default class AudioPlayerAmbisonics {
         this.sound.isPlaying = false;
         this.$view.setAudioPlaying(false);
         console.log("stop audio");
+                //     (document.getElementById('play') as HTMLButtonElement).disabled = false;
+        //     (document.getElementById('stop') as HTMLButtonElement).disabled = true;
     }
 
     private get isPlaying() {
