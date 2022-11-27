@@ -1,0 +1,40 @@
+[
+    {
+        "file": "Song+Say-0123in6ch-channels.m4a",
+        "path": "Media",
+        "size": "2.94 MB",
+        "ambiOrder": "F|S|T",
+        "routing": "2h1p",
+        "format": "AAC 4 channel FOA in 5.1 file that can be played also on iOS",
+        "description": "This is the...",
+        "license": "Free to use"
+    },
+    {
+        "file": "AMB8-Ascendo-256k.m4a",
+        "path": "Media",
+        "size": "3.93 MB",
+        "ambiOrder": "S",
+        "routing": "2h1p"
+    },
+    {
+        "file": "BIS-Eigenmike-256k_AMB8.m4a",
+        "path": "Media",
+        "size": "6.45 MB",
+        "ambiOrder": "S",
+        "routing": "2h1p"
+    },
+    {
+        "file": "AMB8-Gaudete-256k.m4a",
+        "path": "Media",
+        "size": "4.38 MB",
+        "ambiOrder": "S",
+        "routing": "2h1p"
+    },
+    {
+        "file": "AMB8-Rigoletto-256k.m4a",
+        "path": "Media",
+        "size": "2.94 MB",
+        "ambiOrder": "S",
+        "routing": "2h1p"
+    }
+]

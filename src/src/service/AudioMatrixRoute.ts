@@ -4,10 +4,13 @@ import { AudioTemplateRoute } from "./AudioTemplateRoute";
 
 export class AudioMatrixRoute {
     public current: any = AudioRoute.default;
+    private templateRouteName: AudioTemplateRoute = AudioTemplateRoute.default;
     private customized: boolean = false;
 
     public readonly inputs: number = 16;
     public readonly outputs: number = 16;
+
+    public onRouteChange? = (template: AudioTemplateRoute, route: AudioRoute) => void {};
 
     constructor() {
     }
@@ -31,6 +34,9 @@ export class AudioMatrixRoute {
     public setInput(outputIndex: number, inputIndex: number) {
         this.current[outputIndex] = inputIndex;
         this.customized = true;
+        this.templateRouteName = AudioTemplateRoute.custom;
+        // TODO: check if matching any route
+        this.onRouteChange(this.templateRouteName, [...this.current]);
     }
 
     /**
@@ -39,6 +45,7 @@ export class AudioMatrixRoute {
      */
     public select(template: AudioTemplateRoute) {
         this.customized = false;
+        this.templateRouteName = template;
         let transfer = null;
         switch (template) {
             case AudioTemplateRoute.default:
@@ -61,5 +68,6 @@ export class AudioMatrixRoute {
         }
 
         this.current = transfer.map(object => object);
+        this.onRouteChange(this.templateRouteName, [...this.current]);
     }
 }

@@ -1,4 +1,4 @@
-import * as audioSources from "../content/soundlinks.json";
+// import * as audioSources from "../content/soundlinks.json";
 import Tool from '../utils/Tools';
 import Sound from "../models/Sound";
 import ArrayUtil from "../utils/ArrayUtil";
@@ -10,6 +10,8 @@ import { AudioTemplateRoute } from "./AudioTemplateRoute";
 import { AudioMatrixRoute } from "./AudioMatrixRoute";
 import DOMUtil from "../utils/DOMUtil";
 import AudioFileDrop from "./AudioFileDrop";
+import { getFetching } from '../utils/FetcherUtil';
+import { AudioRoute } from './AudioRoute';
 
 export default class AudioPlayer {
 
@@ -18,7 +20,7 @@ export default class AudioPlayer {
     public audioContext: AudioContext;
     public links: Sound[];
 
-    private audioRouteOutput: AudioMatrixRoute = new AudioMatrixRoute();
+    private audioRouteOutput: AudioMatrixRoute;
 
     private audioElement: HTMLAudioElement;
     private audioInputGain: GainNode;
@@ -39,31 +41,46 @@ export default class AudioPlayer {
     }
 
     private constructor() {
+
+        this.audioRouteOutput = new AudioMatrixRoute();
+        this.audioRouteOutput.onRouteChange = this.onAudioRouteChange;
+
+        this.initiate();
+    }
+
+    private async initiate() {
         const self = this;
 
         const selectListOfAudioFiles = Tool.$dom("inputSelectAudioFile");
         const itt = Tool.$dom("audio-dropdown-list");
 
-        this.links = ArrayUtil.toArray<Sound>(audioSources).map((x) => new Sound(x));
-        this.links.forEach((audio: Sound) => {
-            if (audio.path == '') {
-                return;
-            }
-            let option = document.createElement("option");
-            option.setAttribute("id", `R-${audio.file}`);
-            option.setAttribute("value", `../${audio.path}/${audio.file}`);
-            option.text = audio.file;
-            selectListOfAudioFiles.appendChild(option);
+        try {
+            const audioSources = await getFetching<Sound[]>("/sounds.json");
+            this.links = ArrayUtil.toArray<Sound>(audioSources).map((x) => new Sound(x));
 
-            if (audio.path == "sounds-amb8") {
+            this.links.forEach((audio: Sound) => {
+                if (audio.path == '') {
+                    return;
+                }
+                let option = document.createElement("option");
+                option.setAttribute("id", `R-${audio.file}`);
+                option.setAttribute("value", `./${audio.path}/${audio.file}`);
+                option.text = audio.file;
+                selectListOfAudioFiles.appendChild(option);
+
+                // if (audio.path == "sounds-amb8") {
                 let liitem = document.createElement("li");
                 liitem.setAttribute("id", `R-${audio.file}`);
-                liitem.dataset.link = `../${audio.path}/${audio.file}`;
+                liitem.dataset.link = `./${audio.path}/${audio.file}`;
                 liitem.innerHTML = `<span class="item-title">${audio.file}</span> <span class="item-size">${audio.size ? audio.size : ''}</span> <span class="item-format">${audio.format ? audio.format : ''}</span> <span class="item-license">${audio.license ? audio.license : ''}</span>`;
                 itt.appendChild(liitem);
-            }
-        });
-        console.log(this.links, audioSources)
+                // }
+            });
+            console.log(this.links, audioSources);
+        } catch(error) {
+            console.log(`Error parsing soundfiles`, error);
+            throw new Error(error);
+        }
 
         // Create an AudioContext
         this.audioContext = new AudioContext();
@@ -72,7 +89,7 @@ export default class AudioPlayer {
         this.audioElement = document.createElement("audio");
         this.audioElement.loop = true;
         this.audioElement.crossOrigin = "anonymous";
-        this.audioElement.src = audioSources[3]["file"];
+        this.audioElement.src = this.links.length !== 0 ? this.links[0].file : "";
         this.audioElement.volume = 1;
         this.audioElement.controls = true;
 
@@ -98,6 +115,18 @@ export default class AudioPlayer {
             } else {
                 Tool.$attr("status-audio-timer", `${currTime}/${duration}`);
             }
+        }
+
+        this.audioElement.onplay = function() {
+            console.log("ON PLAY")
+        }
+
+        this.audioElement.onpause = function() {
+            console.log("ON PAUSE");
+        }
+
+        this.audioElement.onended = function() {
+            console.log("ON ENDED");
         }
 
         console.log({ element: this.audioElement });
@@ -207,7 +236,7 @@ export default class AudioPlayer {
 
         Tool.$dom("inputCustomAudioLink").onchange = function(this: HTMLInputElement) {
             console.log("Input custom link: ", this.value);
-            self.audioElement.src = window.URL.createObjectURL(this.value);
+            self.audioElement.src = window.URL.createObjectURL(this.value as any);
         };
 
         Tool.$dom("inputSelectAudioFile").onchange = function(this: HTMLInputElement) {
@@ -217,7 +246,7 @@ export default class AudioPlayer {
                 self.audioElement.src = this.value; //const mediaSource = new MediaSource();
             } else {
                 // Avoid using this in new browsers, as it is going away.
-                self.audioElement.src = window.URL.createObjectURL(this.value);
+                self.audioElement.src = window.URL.createObjectURL(this.value as any);
             }
         };
 
@@ -278,7 +307,7 @@ export default class AudioPlayer {
                     }
                 }
 
-                if (e.detail.hasOwnProperty("audioPlaying")) {
+                if (e.detail.hasOwnProperty("audioPlaying")) { // TODO: working????
                     if (item.dataset.key === "audio-play-button-icon") {
                         if (e.detail.audioPlaying) {
                             item.classList.add('ht-custom-btn--audio--playing');
@@ -352,6 +381,21 @@ export default class AudioPlayer {
         });
     }
 
+    private onAudioRouteChange = (template: AudioTemplateRoute, route: AudioRoute) => {
+        console.log(`Audio matrix template '${template}' routed`);
+        // Tool.$dom(``)
+        const allBtns = document.querySelectorAll(`button.template`);
+        if (allBtns) {
+            allBtns.forEach((el: HTMLButtonElement) => {
+                el.classList.remove('selected')
+                console.log(el.classList);
+                if (el.dataset.template === template) {
+                    el.classList.add('selected');
+                }
+            })
+        }
+    };
+
     /**
      * Create the matrix routing DOM-view
      */
@@ -368,7 +412,7 @@ export default class AudioPlayer {
             row.append(input);
 
             let inputValue = ( y == this.audioRouteOutput.inputs ? -1 : y );
-            console.log(inputValue)
+            // console.log(inputValue);
 
             for (let x = 0; x < this.audioRouteOutput.outputs; x++) {
                 // outputs
@@ -509,13 +553,22 @@ export default class AudioPlayer {
         this.mergeChannels();
         try {
             if (this.audioElement.paused && this.audioElement.currentTime >= 0 && !this.audioElement.ended) {
-                window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: true } }) )
                 this.audioContext.resume();
                 this.audioElement.play();
+                window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: true } }) )
             } else {
                 window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: false } }) )
                 this.audioElement.pause();
             }
+
+            if (this.audioElement.paused) {
+                (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).textContent = "Play";
+                (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).textContent = "Play";
+            } else {
+                (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).textContent = "Pause";
+                (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).textContent = "Pause";
+            }
+
         } catch(error) {
             console.error(error);
         }
