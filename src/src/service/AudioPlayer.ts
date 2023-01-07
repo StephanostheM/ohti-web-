@@ -569,6 +569,7 @@ export default class AudioPlayer {
         this.decoderFOA.setRenderingMode("ambisonic")
         this.decoderSOA.setRenderingMode("off");
         this.decoderTOA.setRenderingMode("off");
+        this.mergeChannels();
     }
 
     selectSecondOrderAmbisonic = () => {
@@ -577,6 +578,7 @@ export default class AudioPlayer {
         this.decoderFOA.setRenderingMode("off")
         this.decoderSOA.setRenderingMode("ambisonic");
         this.decoderTOA.setRenderingMode("off");
+        this.mergeChannels();
     }
 
     selectThirdOrderAmbisonic = () => {
@@ -585,6 +587,7 @@ export default class AudioPlayer {
         this.decoderFOA.setRenderingMode("off")
         this.decoderSOA.setRenderingMode("off");
         this.decoderTOA.setRenderingMode("ambisonic");
+        this.mergeChannels();
     }
 
     toggleAudioPlayback = (event) => {
