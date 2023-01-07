@@ -632,13 +632,14 @@ export default class AudioPlayer {
      * @param euler null
      */
     rotateSoundField(mtx3: any, euler: any = null) {
-        if (this.ambisonicOrderNum == 2) {
-            this.decoderTOA.setRotationMatrix3(mtx3);
-        } else if (this.ambisonicOrderNum == 1) {
-            this.decoderSOA.setRotationMatrix3(mtx3);
-        } else {
-            this.decoderFOA.setRotationMatrix3(mtx3);
-        }
+        this.getCurrentDecoder().setRotationMatrix3(mtx3);
+        // if (this.ambisonicOrderNum == 2) {
+        //     this.decoderTOA.setRotationMatrix3(mtx3);
+        // } else if (this.ambisonicOrderNum == 1) {
+        //     this.decoderSOA.setRotationMatrix3(mtx3);
+        // } else {
+        //     this.decoderFOA.setRotationMatrix3(mtx3);
+        // }
     }
 
     // listItem(item) {
