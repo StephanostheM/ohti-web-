@@ -642,38 +642,4 @@ export default class AudioPlayer {
         // }
     }
 
-    // listItem(item) {
-    //     let li = document.createElement("LI");
-    //     li.innerHTML = `<strong>${item.file}</strong> "${item.path}" (${item.size}) <a href="${item.path}/${item.file}">link</a> <audio src="${item.path}/${item.file}" controls="true"></audio>`;
-
-    //     if (item.description) {
-    //         li.innerHTML += `<br/><i>${item.description}</i>`;
-    //     }
-
-    //     if (item.license) {
-    //         li.innerHTML += `<p>${item.license}</p>`;
-    //     }
-
-    //     return li;
-    // }
-
-    // async getSounds() {
-    //     try {
-    //         let sounds = await fetch("soundlinks.json");
-    //         let blob = await sounds.json();
-    //         console.log(blob);
-    //         const frag = document.createDocumentFragment();
-    //         blob.forEach((item: any) => {
-    //             if (item.file != "") {
-    //                 frag.appendChild(this.listItem(item));
-    //             }
-    //         });
-
-    //         //document.getElementById("soundslist").append(frag);
-
-    //         this.links = ArrayUtil.toArray<Sound>(blob).map((x) => new Sound(x));
-    //     } catch(err) {
-    //         console.error(err);
-    //     }
-    // }
 }
