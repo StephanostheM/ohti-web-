@@ -4,7 +4,7 @@ import Sound from "../models/Sound";
 import ArrayUtil from "../utils/ArrayUtil";
 import Events from "../utils/Events";
 // import Omnitone from 'omnitone/build/omnitone.min.esm.js';
-import Omnitone from "../custom-build/omnitone.esm.min.js";
+import Omnitone from "../custom-build/omnitone.esm.js";
 import NumberUtil from "../utils/NumberUtil";
 import { AudioRoute, AudioTemplateRoute } from "./AudioTemplateRoute";
 import { AudioMatrixRoute } from "./AudioMatrixRoute";
