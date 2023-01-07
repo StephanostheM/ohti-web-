@@ -1,5 +1,4 @@
-import { AudioRoute } from "./AudioRoute";
-import { AudioTemplateRoute } from "./AudioTemplateRoute";
+import { AudioRoute, AudioTemplateRoute } from "./AudioTemplateRoute";
 
 
 export class AudioMatrixRoute {

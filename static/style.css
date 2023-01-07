@@ -204,7 +204,6 @@ canvas {
 }
 .ht-custom-btn {
     transition: all 100ms linear;
-    border: 4px solid #fff;
 }
 .ht-custom-btn--ble {
     width: 60px;
@@ -338,6 +337,12 @@ button, select {
     max-width: 100%;
     overflow: hidden;
     cursor: pointer;
+}
+button.template:disabled {
+    background: #370754;
+    border-color: #4c1daa;
+    box-shadow: inset 1px 1px 2px 0px #3f1cc8;
+    color: #7b35d4;
 }
 button.selected {
     background-color: #9ced1f;

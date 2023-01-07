@@ -6,12 +6,11 @@ import Events from "../utils/Events";
 // import Omnitone from 'omnitone/build/omnitone.min.esm.js';
 import Omnitone from "../custom-build/omnitone.esm.min.js";
 import NumberUtil from "../utils/NumberUtil";
-import { AudioTemplateRoute } from "./AudioTemplateRoute";
+import { AudioRoute, AudioTemplateRoute } from "./AudioTemplateRoute";
 import { AudioMatrixRoute } from "./AudioMatrixRoute";
 import DOMUtil from "../utils/DOMUtil";
 import AudioFileDrop from "./AudioFileDrop";
 import { getFetching } from '../utils/FetcherUtil';
-import { AudioRoute } from './AudioRoute';
 
 export default class AudioPlayer {
 
@@ -65,16 +64,18 @@ export default class AudioPlayer {
                 let option = document.createElement("option");
                 option.setAttribute("id", `R-${audio.file}`);
                 option.setAttribute("value", `./${audio.path}/${audio.file}`);
+                option.setAttribute(`data-routing`, audio.routing);
+                option.setAttribute(`data-order`, audio.ambiorder);
                 option.text = audio.file;
                 selectListOfAudioFiles.appendChild(option);
 
-                // if (audio.path == "sounds-amb8") {
                 let liitem = document.createElement("li");
                 liitem.setAttribute("id", `R-${audio.file}`);
                 liitem.dataset.link = `./${audio.path}/${audio.file}`;
+                liitem.setAttribute(`data-routing`, audio.routing);
+                liitem.setAttribute(`data-order`, audio.ambiorder);
                 liitem.innerHTML = `<span class="item-title">${audio.file}</span> <span class="item-size">${audio.size ? audio.size : ''}</span> <span class="item-format">${audio.format ? audio.format : ''}</span> <span class="item-license">${audio.license ? audio.license : ''}</span>`;
                 itt.appendChild(liitem);
-                // }
             });
             console.log(this.links, audioSources);
         } catch(error) {
@@ -252,7 +253,12 @@ export default class AudioPlayer {
 
         Tool.$event("audio-dropdown-list", "click", function(event) {
             console.log("Loading selected item: ", { ev: event.target.dataset });
-            console.log({ elem: self.audioElement })
+            console.log({ elem: self.audioElement });
+
+            if (event.target.dataset.link === undefined || event.target.dataset.link === "") {
+                console.warn("ok")
+                return;
+            }
 
             const links = document.querySelectorAll("[data-link]");
             Array.from(links).forEach((element) => {
@@ -266,6 +272,25 @@ export default class AudioPlayer {
             } else {
                 // Avoid using this in new browsers, as it is going away.
                 self.audioElement.src = window.URL.createObjectURL(event.target.dataset.link);
+            }
+
+            const template = event.target.dataset.routing;
+            if (template && template !== undefined && template !== "") {
+                console.log(`Audio matrix template selected '${template}'`);
+                self.audioRouteOutput.select(AudioTemplateRoute[template]);
+                self.generateChannelSelector();
+            }
+
+            const order = event.target.dataset.order;
+            if (order && order !== undefined && order !== "") {
+                console.log(`Audio ambisonic order selected '${order}'`);
+                if (order === "F" || order == "first") {
+                    self.selectFirstOrderAmbisonic();
+                } else if (order === "S" || order == "second") {
+                    self.selectSecondOrderAmbisonic();
+                } else if (order === "T" || order == "third") {
+                    self.selectThirdOrderAmbisonic();
+                }
             }
         });
 
@@ -388,11 +413,10 @@ export default class AudioPlayer {
         if (allBtns) {
             allBtns.forEach((el: HTMLButtonElement) => {
                 el.classList.remove('selected')
-                console.log(el.classList);
                 if (el.dataset.template === template) {
                     el.classList.add('selected');
                 }
-            })
+            });
         }
     };
 
@@ -530,22 +554,37 @@ export default class AudioPlayer {
 
     toggleAmbisonicOrder = (event) => {
         this.ambisonicOrderNum = (this.ambisonicOrderNum+1)%3;
-        if (this.ambisonicOrderNum == 2) {
-            document.getElementById("status-ambisonic-order").innerText = "3rd order";
-            this.decoderFOA.setRenderingMode("off")
-            this.decoderSOA.setRenderingMode("off");
-            this.decoderTOA.setRenderingMode("ambisonic");
-        } else if (this.ambisonicOrderNum == 1) {
-            document.getElementById("status-ambisonic-order").innerText = "2nd order";
-            this.decoderFOA.setRenderingMode("off")
-            this.decoderSOA.setRenderingMode("ambisonic");
-            this.decoderTOA.setRenderingMode("off");
+        if (this.ambisonicOrderNum === 2) {
+            this.selectThirdOrderAmbisonic();
+        } else if (this.ambisonicOrderNum === 1) {
+            this.selectSecondOrderAmbisonic();
         } else {
-            document.getElementById("status-ambisonic-order").innerText = "1st order";
-            this.decoderFOA.setRenderingMode("ambisonic")
-            this.decoderSOA.setRenderingMode("off");
-            this.decoderTOA.setRenderingMode("off");
+            this.selectFirstOrderAmbisonic();
         }
+    }
+
+    selectFirstOrderAmbisonic = () => {
+        this.ambisonicOrderNum = 0;
+        document.getElementById("status-ambisonic-order").innerText = "1st order";
+        this.decoderFOA.setRenderingMode("ambisonic")
+        this.decoderSOA.setRenderingMode("off");
+        this.decoderTOA.setRenderingMode("off");
+    }
+
+    selectSecondOrderAmbisonic = () => {
+        this.ambisonicOrderNum = 1;
+        document.getElementById("status-ambisonic-order").innerText = "2nd order";
+        this.decoderFOA.setRenderingMode("off")
+        this.decoderSOA.setRenderingMode("ambisonic");
+        this.decoderTOA.setRenderingMode("off");
+    }
+
+    selectThirdOrderAmbisonic = () => {
+        this.ambisonicOrderNum = 2;
+        document.getElementById("status-ambisonic-order").innerText = "3rd order";
+        this.decoderFOA.setRenderingMode("off")
+        this.decoderSOA.setRenderingMode("off");
+        this.decoderTOA.setRenderingMode("ambisonic");
     }
 
     toggleAudioPlayback = (event) => {
