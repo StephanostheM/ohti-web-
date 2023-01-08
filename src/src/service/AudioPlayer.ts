@@ -11,6 +11,10 @@ import { AudioMatrixRoute } from "./AudioMatrixRoute";
 import DOMUtil from "../utils/DOMUtil";
 import AudioFileDrop from "./AudioFileDrop";
 import { getFetching } from '../utils/FetcherUtil';
+import OmnitoneFOAHrirMagLsBase64 from '../hrirs/omnitone-foa-hrir-magls-base64';
+import OmnitoneSOAHrirMagLsBase64 from '../hrirs/omnitone-soa-hrir-magls-base64';
+import OmnitoneTOAHrirMagLsBase64 from '../hrirs/omnitone-toa-hrir-magls-base64';
+import { AudioHRIR, AudioHRIR_ToText } from './AudioHRIR';
 
 export default class AudioPlayer {
 
@@ -26,10 +30,16 @@ export default class AudioPlayer {
     private audioElementSource: MediaElementAudioSourceNode;
 
     private ambisonicOrderNum: number = 2;
+    private ambisonicMethod: AudioHRIR = AudioHRIR.google;
+    private rotationMtx3: any;
 
     private decoderFOA: any;
     private decoderSOA: any;
     private decoderTOA: any;
+
+    private magDecoderFOA: any;
+    private magDecoderSOA: any;
+    private magDecoderTOA: any;
 
     private static instance: AudioPlayer;
     public static getInstance(): AudioPlayer {
@@ -50,6 +60,7 @@ export default class AudioPlayer {
     private async initiate() {
         const self = this;
 
+        // Add audio files to list
         const selectListOfAudioFiles = Tool.$dom("inputSelectAudioFile");
         const itt = Tool.$dom("audio-dropdown-list");
 
@@ -146,11 +157,9 @@ export default class AudioPlayer {
         // this.audioInputGain.connect(this.splitter);
         // this.merger = this.audioContext.createChannelMerger(this.audioRouteOutput.inputs);
 
-        // 4.a Creates First Order Ambisonic Decoder
+        // 4.a Creates First Order Ambisonic Decoder (Google HRIR)
         this.decoderFOA = Omnitone.createFOARenderer(this.audioContext, {
-            HRTFSetUrl: "/omnitone/build/resources/", // FuMa ordering (W,X,Y,Z).
             ambisonicOrder: 1,
-            // postGainDB: 30,
             // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
             channelMap: [0, 3, 1, 2]
         });
@@ -165,9 +174,24 @@ export default class AudioPlayer {
             console.error(onInitializationError);
         });
 
-        // 4.b Creates Second Order Ambisonic Decoder
+        // MagLS HRIR
+        this.magDecoderFOA = Omnitone.createFOARenderer(this.audioContext, {
+            hrirBufferList: OmnitoneFOAHrirMagLsBase64,
+            ambisonicOrder: 1,
+            channelMap: [0, 3, 1, 2]
+        });
+        this.magDecoderFOA.initialize().then(() => {
+            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
+            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
+            this.magDecoderFOA.setRenderingMode("off");
+            this.magDecoderFOA.output.connect(this.audioContext.destination);
+        },
+        function (onInitializationError) {
+            console.error(onInitializationError);
+        });
+
+        // 4.b Creates Second Order Ambisonic Decoder (Google HRIR)
         this.decoderSOA = Omnitone.createHOARenderer(this.audioContext, {
-            HRTFSetUrl: "/omnitone/build/resources/", // FuMa ordering (W,X,Y,Z).
             ambisonicOrder: 2,
             // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
             channelMap: [0, 3, 1, 2]
@@ -176,7 +200,6 @@ export default class AudioPlayer {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
             let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
-
             this.decoderSOA.setRenderingMode(state);
             this.decoderSOA.output.connect(this.audioContext.destination);
         },
@@ -184,11 +207,25 @@ export default class AudioPlayer {
             console.error(onInitializationError);
         });
 
-        // 4.c Creates Third Order Ambisonic Decoder
+        // MagLS HRIR
+        this.magDecoderSOA = Omnitone.createHOARenderer(this.audioContext, {
+            hrirBufferList: OmnitoneSOAHrirMagLsBase64,
+            ambisonicOrder: 2,
+            channelMap: [0, 3, 1, 2]
+        });
+        this.magDecoderSOA.initialize().then(() => {
+            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
+            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
+            this.magDecoderSOA.setRenderingMode("off");
+            this.magDecoderSOA.output.connect(this.audioContext.destination);
+        },
+        function (onInitializationError) {
+            console.error(onInitializationError);
+        });
+
+        // 4.c Creates Third Order Ambisonic Decoder (Google HRIR)
         this.decoderTOA = Omnitone.createHOARenderer(this.audioContext, {
-            HRTFSetUrl: "/omnitone/build/resources/", // FuMa ordering (W,X,Y,Z).
             ambisonicOrder: 3,
-            // postGainDB: 30,
             // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
             channelMap: [0, 3, 1, 2]
         });
@@ -196,9 +233,24 @@ export default class AudioPlayer {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
             let state = this.ambisonicOrderNum == 2 ? "ambisonic" : "off";
-
             this.decoderTOA.setRenderingMode(state);
             this.decoderTOA.output.connect(this.audioContext.destination);
+        },
+        function (onInitializationError) {
+            console.error(onInitializationError);
+        });
+
+        // MagLS HRIR
+        this.magDecoderTOA = Omnitone.createHOARenderer(this.audioContext, {
+            hrirBufferList: OmnitoneTOAHrirMagLsBase64,
+            ambisonicOrder: 3,
+            channelMap: [0, 3, 1, 2]
+        });
+        this.magDecoderTOA.initialize().then(() => {
+            (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
+            (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
+            this.magDecoderTOA.setRenderingMode("off");
+            this.magDecoderTOA.output.connect(this.audioContext.destination);
         },
         function (onInitializationError) {
             console.error(onInitializationError);
@@ -256,8 +308,13 @@ export default class AudioPlayer {
             console.log({ elem: self.audioElement });
 
             if (event.target.dataset.link === undefined || event.target.dataset.link === "") {
-                console.warn("ok")
+                console.warn("Link is undefined, not loading target");
                 return;
+            }
+
+            // Verify if it's currently playing
+            if (self.audioElement && !self.audioElement.paused) {
+                self.toggleAudioPlayback(null);
             }
 
             const links = document.querySelectorAll("[data-link]");
@@ -368,11 +425,26 @@ export default class AudioPlayer {
                 } catch(error) {
                     console.error(error);
                 }
-                // this.getCurrentDecoder().input.disconnect();
+                // this.getCurrentDecoder.input.disconnect();
                 // this.audioContext.resume();
                 // this.audioElement.play();
                 this.mergeChannels();
             }
+        });
+
+        // Bind events to HRIR buttons
+        Tool.$dom("status-hrir").innerText = AudioHRIR_ToText(this.ambisonicMethod);
+        const hrirBtn = document.querySelectorAll("[data-hrir]");
+        console.log("HRIR buttons:", hrirBtn);
+        Array.from(hrirBtn).forEach((element) => {
+            Tool.$event(element, "click", (event) => {
+                const action = event.target.dataset.hrir;
+                if (action) {
+                    console.log(`Audio HRIR '${action}'`);
+
+                    this.setHRIR(AudioHRIR[action]);
+                }
+            });
         });
 
         // Bind events to template buttons
@@ -396,24 +468,62 @@ export default class AudioPlayer {
             Tool.$event(element, "click", (event) => {
                 const action = event.target.dataset.inputGain as number;
                 if (action) {
-                    console.log(`Audio gain template '${action}'`);
                     let dat = NumberUtil.decibelToGain(action);
-                    console.log(dat);
                     this.audioInputGain.gain.value = dat;
+                    console.log(`Audio gain template '${action}'dB => ${dat}`);
                     Tool.$attr("audio-gain-level", `${action}dB`);
+                    this.onAudioGainChanged(action);
                 }
             });
         });
     }
 
+    /**
+     * Called when a new gain value is set
+     * @param gain [number] level
+     */
+    private onAudioGainChanged = (gain: number) => {
+        console.log(`Audio Gain '${gain}'`);
+        const allBtns = document.querySelectorAll(`button.gain`);
+        if (allBtns) {
+            allBtns.forEach((el: HTMLButtonElement) => {
+                el.classList.remove('selected')
+                if (el.dataset.inputGain === gain.toString()) {
+                    el.classList.add('selected');
+                }
+            });
+        }
+    };
+
+    /**
+     * Called when a new routing is made in the Audio Matrix
+     * @param template [string] name
+     * @param route [array] list with input output routing
+     */
     private onAudioRouteChange = (template: AudioTemplateRoute, route: AudioRoute) => {
         console.log(`Audio matrix template '${template}' routed`);
-        // Tool.$dom(``)
         const allBtns = document.querySelectorAll(`button.template`);
         if (allBtns) {
             allBtns.forEach((el: HTMLButtonElement) => {
                 el.classList.remove('selected')
                 if (el.dataset.template === template) {
+                    el.classList.add('selected');
+                }
+            });
+        }
+    };
+
+    /**
+     * Called when a new ambisonic HRIR method is choosen
+     * @param method [string] name
+     */
+    private onFilterMethodChange = (method: AudioHRIR) => {
+        console.log(`Audio HRIR method '${method}'`);
+        const allBtns = document.querySelectorAll(`button.hrir`);
+        if (allBtns) {
+            allBtns.forEach((el: HTMLButtonElement) => {
+                el.classList.remove('selected')
+                if (el.dataset.hrir === method) {
                     el.classList.add('selected');
                 }
             });
@@ -490,7 +600,6 @@ export default class AudioPlayer {
      */
     mergeChannels() {
         try {
-            console.log("gain", this.audioInputGain)
             const splitter = this.audioContext.createChannelSplitter(this.audioRouteOutput.outputs); // out 10
             //this.audioElementSource.connect(splitter); // mediaElemSource is video or audio element
             if (this.lastSplitter !== null) {
@@ -500,10 +609,11 @@ export default class AudioPlayer {
             this.audioInputGain.connect(splitter);
             const merger = this.audioContext.createChannelMerger(this.audioRouteOutput.inputs); // inouts 9
 
-            console.log("Splitter nr of input:", splitter.numberOfInputs, "=1 nr of out:", splitter.numberOfOutputs, "=16");
-            console.log("Merger nr of input:", merger.numberOfInputs, "=16 nr of out:", merger.numberOfOutputs, "=1");
-
+            console.log("===============================================");
+            console.log("Splitter    : nr of input", splitter.numberOfInputs, "= 1 nr of out:", splitter.numberOfOutputs, "= 16");
+            console.log("Merger      : nr of input ", merger.numberOfInputs, "= 16 nr of out:", merger.numberOfOutputs, "= 1");
             console.log("Route output:", this.audioRouteOutput);
+            const routeLog = [];
             this.audioRouteOutput.current.forEach((input, outIndex) => {
                 // node, output , input
 
@@ -514,7 +624,7 @@ export default class AudioPlayer {
                 if (input != -1) {
                     // Combine the output of each input 'splitter' node back into one stream using the merger.
                     splitter.connect(merger, input, outIndex); // --------- xxx yes
-                    console.log(`Route: input ${input+1} => ${outIndex+1}`);
+                    routeLog.push(`input ${input+1} => ${outIndex+1}`);
                 } else {
                     // Create dummy silent node and connect it
                     const silence = this.audioContext.createBufferSource();
@@ -523,7 +633,7 @@ export default class AudioPlayer {
                     silence.connect(volume);
                     volume.connect(merger, 0, outIndex);
                     silence.start(0);
-                    console.log("Silence ch count:", silence.channelCount, ",in=", silence.numberOfInputs, "out=", silence.numberOfOutputs);
+                    // console.log("Silence ch count:", silence.channelCount, ",in=", silence.numberOfInputs, "out=", silence.numberOfOutputs);
 
                     // const source3 = this.audioContext.createOscillator();
                     // source3.frequency.value = 440;
@@ -534,13 +644,15 @@ export default class AudioPlayer {
                     // source3.start(0);
 
                     // splitter.connect(merger, outIndex, this.audioRouteOutput.outputs - 1);
-                    console.log(`Route: input ${this.audioRouteOutput.outputs} => ${outIndex+1} (fake silent input)`);
+                    routeLog.push(`input ${this.audioRouteOutput.outputs} => ${outIndex+1} (fake silent input)`);
                 }
             });
-            console.log("Splitter   :", splitter);
-            console.log("Merger     :", merger);
-            console.log("Decoder in :", this.getCurrentDecoder.input);
-            console.log("Decoder out:", this.getCurrentDecoder.output);
+            console.log("Route       :\n\t\t\t\t" + routeLog.join("\n\t\t\t\t"));
+            console.log("Splitter    :", splitter);
+            console.log("Merger      :", merger);
+            console.log("Gain        :", this.audioInputGain);
+            console.log("Decoder in  :", this.getCurrentDecoder.input);
+            console.log("Decoder out :", this.getCurrentDecoder.output);
 
             // Out from Omnitone decoder, send toaudio context
             merger.connect(this.getCurrentDecoder.input);
@@ -550,6 +662,20 @@ export default class AudioPlayer {
         } catch(error) {
             console.error(error);
         }
+    }
+
+    setHRIR(filter: AudioHRIR) {
+        this.ambisonicMethod = filter;
+
+        if (this.ambisonicOrderNum === 2) {
+            this.selectThirdOrderAmbisonic();
+        } else if (this.ambisonicOrderNum === 1) {
+            this.selectSecondOrderAmbisonic();
+        } else {
+            this.selectFirstOrderAmbisonic();
+        }
+
+        this.onFilterMethodChange(filter);
     }
 
     toggleAmbisonicOrder = (event) => {
@@ -563,35 +689,66 @@ export default class AudioPlayer {
         }
     }
 
-    selectFirstOrderAmbisonic = () => {
-        this.ambisonicOrderNum = 0;
-        document.getElementById("status-ambisonic-order").innerText = "1st order";
-        this.decoderFOA.setRenderingMode("ambisonic")
+    resetAllAmbisonicDecoder = () => {
+        this.decoderFOA.setRenderingMode("off");
         this.decoderSOA.setRenderingMode("off");
         this.decoderTOA.setRenderingMode("off");
+
+        this.magDecoderFOA.setRenderingMode("off");
+        this.magDecoderSOA.setRenderingMode("off");
+        this.magDecoderTOA.setRenderingMode("off");
+    }
+
+    selectFirstOrderAmbisonic = () => {
+        this.ambisonicOrderNum = 0;
+        Tool.$dom("status-ambisonic-order").innerText = "1st order";
+        Tool.$dom("status-hrir").innerText = AudioHRIR_ToText(this.ambisonicMethod);
+        this.resetAllAmbisonicDecoder();
+        if (this.ambisonicMethod === AudioHRIR.google) {
+            this.decoderFOA.setRenderingMode("ambisonic");
+        } else {
+            this.magDecoderFOA.setRenderingMode("ambisonic");
+        }
         this.mergeChannels();
+        if (this.rotationMtx3) {
+            this.rotateSoundField(this.rotationMtx3);
+        }
     }
 
     selectSecondOrderAmbisonic = () => {
         this.ambisonicOrderNum = 1;
-        document.getElementById("status-ambisonic-order").innerText = "2nd order";
-        this.decoderFOA.setRenderingMode("off")
-        this.decoderSOA.setRenderingMode("ambisonic");
-        this.decoderTOA.setRenderingMode("off");
+        Tool.$dom("status-ambisonic-order").innerText = "2nd order";
+        Tool.$dom("status-hrir").innerText = AudioHRIR_ToText(this.ambisonicMethod);
+        this.resetAllAmbisonicDecoder();
+        if (this.ambisonicMethod === AudioHRIR.google) {
+            this.decoderSOA.setRenderingMode("ambisonic");
+        } else {
+            this.magDecoderSOA.setRenderingMode("ambisonic");
+        }
         this.mergeChannels();
+        if (this.rotationMtx3) {
+            this.rotateSoundField(this.rotationMtx3);
+        }
     }
 
     selectThirdOrderAmbisonic = () => {
         this.ambisonicOrderNum = 2;
         document.getElementById("status-ambisonic-order").innerText = "3rd order";
-        this.decoderFOA.setRenderingMode("off")
-        this.decoderSOA.setRenderingMode("off");
-        this.decoderTOA.setRenderingMode("ambisonic");
+        Tool.$dom("status-hrir").innerText = AudioHRIR_ToText(this.ambisonicMethod);
+        this.resetAllAmbisonicDecoder();
+        if (this.ambisonicMethod === AudioHRIR.google) {
+            this.decoderTOA.setRenderingMode("ambisonic");
+        } else {
+            this.magDecoderTOA.setRenderingMode("ambisonic");
+        }
         this.mergeChannels();
+        if (this.rotationMtx3) {
+            this.rotateSoundField(this.rotationMtx3);
+        }
     }
 
     toggleAudioPlayback = (event) => {
-        console.log(this)
+
         this.mergeChannels();
         try {
             if (this.audioElement.paused && this.audioElement.currentTime >= 0 && !this.audioElement.ended) {
@@ -618,11 +775,11 @@ export default class AudioPlayer {
 
     private get getCurrentDecoder() {
         if (this.ambisonicOrderNum == 2) {
-            return this.decoderTOA;
+            return this.ambisonicMethod === AudioHRIR.google ? this.decoderTOA : this.magDecoderTOA;
         } else if (this.ambisonicOrderNum == 1) {
-            return this.decoderSOA;
+            return this.ambisonicMethod === AudioHRIR.google ? this.decoderSOA : this.magDecoderSOA;
         } else {
-            return this.decoderFOA;
+            return this.ambisonicMethod === AudioHRIR.google ? this.decoderFOA : this.magDecoderFOA;
         }
     }
 
@@ -632,14 +789,8 @@ export default class AudioPlayer {
      * @param euler null
      */
     rotateSoundField(mtx3: any, euler: any = null) {
-        this.getCurrentDecoder().setRotationMatrix3(mtx3);
-        // if (this.ambisonicOrderNum == 2) {
-        //     this.decoderTOA.setRotationMatrix3(mtx3);
-        // } else if (this.ambisonicOrderNum == 1) {
-        //     this.decoderSOA.setRotationMatrix3(mtx3);
-        // } else {
-        //     this.decoderFOA.setRotationMatrix3(mtx3);
-        // }
+        this.getCurrentDecoder.setRotationMatrix3(mtx3);
+        this.rotationMtx3 = mtx3;
     }
 
 }

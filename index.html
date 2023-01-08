@@ -44,6 +44,17 @@
 
         <div class="ht-form--button">
             <div class="input-status-feedback">
+                <span>Current HRIR (head-related transfer function):</span>
+                <span class="status-ht-reference" id="status-hrir">
+                </span>
+            </div>
+
+            <button data-hrir="google" class="hrir selected">GoogleVR/SADIE Omnitone</button>
+            <button data-hrir="magls" class="hrir">Magnitude LS (Least Squares)</button>
+        </div>
+
+        <div class="ht-form--button">
+            <div class="input-status-feedback">
                 <span>Current ambisonic order:</span>
                 <span class="status-ht-reference" id="status-ambisonic-order">
                 </span>
@@ -58,6 +69,13 @@
         </div>
 
         <!-- AUDIO FILE FOR PLAYBACK -->
+        <div class="ht-form--button">
+            <label>
+                Custom audio URL:<br/>
+                <input id="inputCustomAudioLink" type="text" placeholder="http://ex.com/data.mp3" />
+            </label>
+        </div>
+
         <div class="ht-form--button">
             <input id="inputCustomAudioFile" class="input-file-upload input-load-audio-file" type="file" accept="audio/*" />
 
@@ -77,6 +95,7 @@
             <button id="btnToggleAudioPlayback" data-key="audio-play-button">Play</button>
             <div class="audio-play-timer"><span data-key="status-audio-timer">0/0</span>s</div>
         </div>
+
         <div class="ht-form--button">
             <div class="input-status-feedback">
                 <span>Audio routing:</span>
@@ -97,18 +116,11 @@
             </div>
             <div data-key="audio-gain-level">0dB</div>
 
-            <button data-input-gain="0">0dB</button>
-            <button data-input-gain="-6">-6dB</button>
-            <button data-input-gain="-12">-12dB</button>
-            <button data-input-gain="-18">-18dB</button>
-            <button data-input-gain="-24">-24dB</button>
-        </div>
-
-        <div class="ht-form--button">
-            <label>
-                Custom audio URL:<br/>
-                <input id="inputCustomAudioLink" type="text" placeholder="http://ex.com/data.mp3" />
-            </label>
+            <button data-input-gain="0" class="gain selected">0dB</button>
+            <button data-input-gain="-6" class="gain">-6dB</button>
+            <button data-input-gain="-12" class="gain">-12dB</button>
+            <button data-input-gain="-18" class="gain">-18dB</button>
+            <button data-input-gain="-24" class="gain">-24dB</button>
         </div>
 
         <div class="ht-form--button" style="display:none">

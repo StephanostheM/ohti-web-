@@ -527,8 +527,8 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
             'array or a buffer list array.'
         );
       }
-      if (Array.isArray(config.hrirBuffer) &&
-          config.hrirBuffer.length === 2) {
+      if (Array.isArray(config.hrirBufferList) &&
+          config.hrirBufferList.length === 2) {
         this._config.bufferList = config.hrirBufferList;
       } else {
         Utils.throw(
@@ -572,9 +572,9 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
           new BufferList(this._context, this._config.pathList, {dataType: 'url'});
     } else if (this._config.bufferList) {
       bufferList =
-          new BufferList(this._context, this._config.bufferList, {verbose: true});
+          new BufferList(this._context, this._config.bufferList);
     } else {
-      bufferList = new BufferList(this._context, OmnitoneFOAHrirBase64, {verbose: true});
+      bufferList = new BufferList(this._context, OmnitoneFOAHrirBase64);
     }
     bufferList.load().then(
         function(hrirBufferList) {
@@ -969,8 +969,8 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
             'array or a buffer list array.'
         );
       }
-      if (Array.isArray(config.hrirBuffer) &&
-          config.hrirBuffer.length === this._config.numberOfStereoChannels) {
+      if (Array.isArray(config.hrirBufferList) &&
+          config.hrirBufferList.length === this._config.numberOfStereoChannels) {
         this._config.bufferList = config.hrirBufferList;
       } else {
         Utils.throw(
@@ -1013,7 +1013,7 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
           new BufferList(this._context, this._config.pathList, {dataType: 'url'});
     } else if (this._config.bufferList) {
       bufferList =
-          new BufferList(this._context, this._config.bufferList, {verbose: true});
+          new BufferList(this._context, this._config.bufferList);
     } else if (this._config.ambisonicOrder === 2) {
       bufferList = new BufferList(this._context, OmnitoneSOAHrirBase64);
     } else {

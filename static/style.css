@@ -535,6 +535,7 @@ input[type="range"]:active::-moz-range-thumb {
 /* Audio selector */
 .select-split {
     display: flex;
+    display: none;
 }
 
 .audio-selector {
@@ -550,7 +551,7 @@ ul#audio-dropdown-list {
     border-radius: 4px;
     border: 1px solid #3d0a58;
     max-height: 200px;
-    overflow-x: scroll;
+    overflow-y: scroll;
 }
 .audio-selector #audio-dropdown-list li {
     border-bottom: 1px solid #592177;
