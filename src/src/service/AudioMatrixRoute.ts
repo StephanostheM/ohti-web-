@@ -53,15 +53,34 @@ export class AudioMatrixRoute {
             case AudioTemplateRoute.linear:
                 transfer = AudioRoute.linear;
                 break;
+            case AudioTemplateRoute.silent:
+                transfer = AudioRoute.silent;
+                break;
+
+            case AudioTemplateRoute.so1h1p:
+                transfer = AudioRoute.so1h1p;
+                break;
+
+            case AudioTemplateRoute.so2h2p:
+                transfer = AudioRoute.so2h2p;
+                break;
+            case AudioTemplateRoute.so2h1v:
+                transfer = AudioRoute.so2h1v;
+                break;
             case AudioTemplateRoute.so2h1p:
                 transfer = AudioRoute.so2h1p;
+                break;
+
+            case AudioTemplateRoute.so3h3p:
+                transfer = AudioRoute.so3h3p;
+                break;
+            case AudioTemplateRoute.so3h2p:
+                transfer = AudioRoute.so3h2p;
                 break;
             case AudioTemplateRoute.so3h1p:
                 transfer = AudioRoute.so3h1p;
                 break;
-            case AudioTemplateRoute.silent:
-                transfer = AudioRoute.silent;
-                break;
+
             default:
                 throw new Error("Trying to select audio route template that doesn't exist");
         }
