@@ -45,19 +45,18 @@
         <div class="ht-form--button">
             <div class="input-status-feedback">
                 <span>Current HRIR (head-related transfer function):</span>
-                <span class="status-ht-reference" id="status-hrir">
-                </span>
+                <span class="status-ht-reference" id="status-hrir"></span>
             </div>
 
-            <button data-hrir="google" class="hrir selected">GoogleVR/SADIE Omnitone</button>
-            <button data-hrir="magls" class="hrir">Magnitude LS (Least Squares)</button>
+            <button data-hrir="magls" class="hrir selected">Magnitude LS (Least Squares)</button>
+            <button data-hrir="google" class="hrir">GoogleVR/SADIE Omnitone</button>
         </div>
 
         <div class="ht-form--button">
             <div class="input-status-feedback">
                 <span>Current ambisonic order:</span>
-                <span class="status-ht-reference" id="status-ambisonic-order">
-                </span>
+                <span class="status-ht-reference" id="status-ambisonic-order"></span>
+                <p>Manually change the order (this does not change audio routing)</p>
             </div>
             <button id="btnToggleAmbisonicDecoderOrder" class="ht-custom-btn">Toggle ambisonic order</button>
         </div>
@@ -97,25 +96,32 @@
         </div>
 
         <div class="ht-form--button">
+            <div class="input-status-feedback" id="audioPlayerContainer">
+                <!-- Append audio element here -->
+            </div>
+        </div>
+
+        <div class="ht-form--button">
             <div class="input-status-feedback">
                 <span>Audio routing:</span>
+                <p>Manually override set audio routing. The routing does not change the order of decoding.</p>
             </div>
             <div id="channel-selector"></div>
 
             <button data-template="custom" class="template selected" disabled>custom</button>
             <button data-template="silent" class="template">silent</button>
-            <button data-template="default" class="template">ambix8</button>
-            <button data-template="linear" class="template">straight</button>
+            <!-- <button data-template="default" class="template">S ambix8</button> -->
+            <!-- <button data-template="linear" class="template">straight</button> -->
 
-            <button data-template="so1h1p" class="template">so1h1p F</button>
+            <button data-template="so1h1p" class="template">FOA 1h1p</button>
 
-            <button data-template="so2h2p" class="template">so2h2p S</button>
-            <button data-template="so2h1v" class="template">so2h1v S</button>
-            <button data-template="so2h1p" class="template">so2h1p S</button>
+            <button data-template="so2h2p" class="template">SOA 2h2p</button>
+            <button data-template="so2h1v" class="template">SOA 2h1v</button>
+            <button data-template="so2h1p" class="template">SOA 2h1p</button>
 
-            <button data-template="so3h3p" class="template">so3h3p T</button>
-            <button data-template="so3h2p" class="template">so3h2p T</button>
-            <button data-template="so3h1p" class="template">so3h1p T</button>
+            <button data-template="so3h3p" class="template">TOA 3h3p</button>
+            <button data-template="so3h2p" class="template">TOA 3h2p</button>
+            <button data-template="so3h1p" class="template">TOA 3h1p</button>
         </div>
 
         <div class="ht-form--button">
@@ -129,12 +135,6 @@
             <button data-input-gain="-12" class="gain">-12dB</button>
             <button data-input-gain="-18" class="gain">-18dB</button>
             <button data-input-gain="-24" class="gain">-24dB</button>
-        </div>
-
-        <div class="ht-form--button" style="display:none">
-            <div class="input-status-feedback" id="audioPlayerContainer">
-                <!-- Append audio element here -->
-            </div>
         </div>
 
     </div>

@@ -30,7 +30,7 @@ export default class AudioPlayer {
     private audioElementSource: MediaElementAudioSourceNode;
 
     private ambisonicOrderNum: number = 2;
-    private ambisonicMethod: AudioHRIR = AudioHRIR.google;
+    private ambisonicMethod: AudioHRIR = AudioHRIR.magls;
     private rotationMtx3: any;
 
     private decoderFOA: any;
@@ -98,12 +98,13 @@ export default class AudioPlayer {
         this.audioContext = new AudioContext();
 
         // 1. Prepare audio element to feed the ambisonic source audio feed.
-        this.audioElement = document.createElement("audio");
+        this.audioElement = document.createElement("audio"); //document.getElementById("audio-player") as HTMLAudioElement;
         this.audioElement.loop = true;
         this.audioElement.crossOrigin = "anonymous";
         this.audioElement.src = this.links.length !== 0 ? this.links[0].file : "";
         this.audioElement.volume = 1;
         this.audioElement.controls = true;
+        this.audioElement.preload = "auto";
 
         this.audioElement.ontimeupdate = function(event) {
             let track = event.target as HTMLAudioElement;
@@ -118,7 +119,7 @@ export default class AudioPlayer {
         }
 
         this.audioElement.onloadedmetadata = function() {
-            self.audioElement.setAttribute("duration", self.audioElement.duration.toString());
+            // self.audioElement.setAttribute("duration", self.audioElement.duration.toString());
 
             let currTime = Math.floor(self.audioElement.currentTime);
             let duration = Math.floor(self.audioElement.duration);
@@ -130,15 +131,18 @@ export default class AudioPlayer {
         }
 
         this.audioElement.onplay = function() {
-            console.log("ON PLAY")
+            console.log("ON PLAY");
+            window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: true } }) )
         }
 
         this.audioElement.onpause = function() {
             console.log("ON PAUSE");
+            window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: false } }) )
         }
 
         this.audioElement.onended = function() {
             console.log("ON ENDED");
+            window.dispatchEvent( new CustomEvent("htsetreference", { detail: { audioPlaying: false } }) )
         }
 
         console.log({ element: this.audioElement });
