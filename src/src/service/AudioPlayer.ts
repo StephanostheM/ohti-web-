@@ -25,7 +25,7 @@ export default class AudioPlayer {
 
     private audioRouteOutput: AudioMatrixRoute;
 
-    private audioElement: HTMLAudioElement;
+    private audioElement: HTMLVideoElement;
     private audioInputGain: GainNode;
     private audioElementSource: MediaElementAudioSourceNode;
 
@@ -98,7 +98,7 @@ export default class AudioPlayer {
         this.audioContext = new AudioContext();
 
         // 1. Prepare audio element to feed the ambisonic source audio feed.
-        this.audioElement = document.createElement("audio"); //document.getElementById("audio-player") as HTMLAudioElement;
+        this.audioElement = document.createElement("video"); //document.getElementById("audio-player") as HTMLAudioElement;
         this.audioElement.loop = true;
         this.audioElement.crossOrigin = "anonymous";
         this.audioElement.src = this.links.length !== 0 ? this.links[0].file : "";

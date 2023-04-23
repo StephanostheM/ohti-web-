@@ -579,3 +579,12 @@ span.item-license {
     font-size: 0.8rem;
     pointer-events: none;
 }
+
+.video-player {
+    width: 100%;
+}
+
+.video-player video {
+    max-width: 100%;
+    width: 100%;
+}
