@@ -788,7 +788,7 @@ export default class AudioPlayer {
     }
 
     /**
-     * Omnitone uses 3x3 row-major matrix to rotate the sound field.
+     * Omnitone uses 3x3 (column-major matrix) to rotate the sound field.
      * @param mtx3 3x3 row major matrix
      * @param euler null
      */

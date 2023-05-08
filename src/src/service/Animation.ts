@@ -260,7 +260,9 @@ export default class AnimationView {
 
         // Omnitone rotate soundfield with Matrix
         // Ambisonics.js rotate soundfield with Euler
-        AudioPlayer.getInstance().rotateSoundField(QuaternionTools.quaternionToMatrix(qRefComp), { x: rollValue, y: pitchValue, z: yawValue });
+        const qMtx = QuaternionTools.quaternionToMatrix(qRefComp);
+        const rowor_to_col = QuaternionTools.rowToColumnMajor(qMtx);
+        AudioPlayer.getInstance().rotateSoundField(rowor_to_col, { x: rollValue, y: pitchValue, z: yawValue });
 
         // Three.js Rotate 3D model
         this.rotateGraphics(qRefComp);
