@@ -196,6 +196,7 @@ export default class QuaternionTools {
      * @returns column-major matrix
      */
     public static rowToColumnMajor(matrix: any) {
+        return [...matrix]
         let rowm = [...matrix]
         for (let i = 0; i < 3; ++i) {
             for (let j = 0; j < 3; ++j){

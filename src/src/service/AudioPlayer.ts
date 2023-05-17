@@ -101,7 +101,7 @@ export default class AudioPlayer {
         this.audioElement = document.createElement("video"); //document.getElementById("audio-player") as HTMLAudioElement;
         this.audioElement.loop = true;
         this.audioElement.crossOrigin = "anonymous";
-        this.audioElement.src = this.links.length !== 0 ? this.links[0].file : "";
+        this.audioElement.src = this.links.length !== 0 ? `./${this.links[0].path}/${this.links[0].file}` : "";
         this.audioElement.volume = 1;
         this.audioElement.controls = true;
         this.audioElement.preload = "auto";
@@ -170,9 +170,12 @@ export default class AudioPlayer {
         this.decoderFOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.ambisonicOrderNum == 0 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum === 0 && this.ambisonicMethod === AudioHRIR.google ? "ambisonic" : "off";
             this.decoderFOA.setRenderingMode(state);
-            this.decoderFOA.output.connect(this.audioContext.destination);
+            // Swap left and right channel
+            this.swapStereoChannels(this.decoderFOA);
+            // Enable this to play out as it is
+            // this.decoderFOA.output.connect(this.audioContext.destination);
         },
         function (onInitializationError) {
             console.error(onInitializationError);
@@ -186,8 +189,12 @@ export default class AudioPlayer {
         this.magDecoderFOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            this.magDecoderFOA.setRenderingMode("off");
-            this.magDecoderFOA.output.connect(this.audioContext.destination);
+            let state = this.ambisonicOrderNum === 0 && this.ambisonicMethod === AudioHRIR.magls ? "ambisonic" : "off";
+            this.magDecoderFOA.setRenderingMode(state);
+            // Swap left and right channel
+            this.swapStereoChannels(this.magDecoderFOA);
+            // Enable this to play out as it is
+            // this.magDecoderFOA.output.connect(this.audioContext.destination);
         },
         function (onInitializationError) {
             console.error(onInitializationError);
@@ -202,9 +209,12 @@ export default class AudioPlayer {
         this.decoderSOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.ambisonicOrderNum == 1 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum === 1 && this.ambisonicMethod === AudioHRIR.google ? "ambisonic" : "off";
             this.decoderSOA.setRenderingMode(state);
-            this.decoderSOA.output.connect(this.audioContext.destination);
+            // Swap left and right channel
+            this.swapStereoChannels(this.decoderSOA);
+            // Enable this to play out as it is
+            // this.decoderSOA.output.connect(this.audioContext.destination);
         },
         function (onInitializationError) {
             console.error(onInitializationError);
@@ -218,8 +228,12 @@ export default class AudioPlayer {
         this.magDecoderSOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            this.magDecoderSOA.setRenderingMode("off");
-            this.magDecoderSOA.output.connect(this.audioContext.destination);
+            let state = this.ambisonicOrderNum === 1 && this.ambisonicMethod === AudioHRIR.magls ? "ambisonic" : "off";
+            this.magDecoderSOA.setRenderingMode(state);
+            // Swap left and right channel
+            this.swapStereoChannels(this.magDecoderSOA);
+            // Enable this to play out as it is
+            // this.magDecoderSOA.output.connect(this.audioContext.destination);
         },
         function (onInitializationError) {
             console.error(onInitializationError);
@@ -232,9 +246,12 @@ export default class AudioPlayer {
         this.decoderTOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            let state = this.ambisonicOrderNum == 2 ? "ambisonic" : "off";
+            let state = this.ambisonicOrderNum === 2 && this.ambisonicMethod === AudioHRIR.google ? "ambisonic" : "off";
             this.decoderTOA.setRenderingMode(state);
-            this.decoderTOA.output.connect(this.audioContext.destination);
+            // Swap left and right channel
+            this.swapStereoChannels(this.decoderTOA);
+            // Enable this to play out as it is
+            // this.decoderTOA.output.connect(this.audioContext.destination);
         },
         function (onInitializationError) {
             console.error(onInitializationError);
@@ -248,8 +265,12 @@ export default class AudioPlayer {
         this.magDecoderTOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
-            this.magDecoderTOA.setRenderingMode("off");
-            this.magDecoderTOA.output.connect(this.audioContext.destination);
+            let state = this.ambisonicOrderNum === 2 && this.ambisonicMethod === AudioHRIR.magls ? "ambisonic" : "off";
+            this.magDecoderTOA.setRenderingMode(state);
+            // Swap left and right channel
+            this.swapStereoChannels(this.magDecoderTOA);
+            // Enable this to play out as it is
+            // this.magDecoderTOA.output.connect(this.audioContext.destination);
         },
         function (onInitializationError) {
             console.error(onInitializationError);
@@ -592,6 +613,16 @@ export default class AudioPlayer {
         this.mergeChannels();
     }
 
+    private swapStereoChannels = (decoder: any) => {
+        const splitterChSwap = this.audioContext.createChannelSplitter(2);
+        const mergerChSwap = this.audioContext.createChannelMerger(2);
+        // connect the merger to the destination
+        mergerChSwap.connect(this.audioContext.destination);
+        decoder.output.connect(splitterChSwap);
+        splitterChSwap.connect(mergerChSwap, 1, 0);
+        splitterChSwap.connect(mergerChSwap, 0, 1);
+    }
+
     private lastSplitter: any = null;
 
     /**
@@ -599,16 +630,18 @@ export default class AudioPlayer {
      */
     mergeChannels() {
         try {
-            const splitter = this.audioContext.createChannelSplitter(this.audioRouteOutput.outputs); // out 10
             //this.audioElementSource.connect(splitter); // mediaElemSource is video or audio element
             if (this.lastSplitter !== null) {
                 this.audioInputGain.disconnect(this.lastSplitter);
+                this.lastSplitter = null;
             }
+
+            const splitter = this.audioContext.createChannelSplitter(this.audioRouteOutput.outputs); // out 10
             this.lastSplitter = splitter;
             this.audioInputGain.connect(splitter);
             const merger = this.audioContext.createChannelMerger(this.audioRouteOutput.inputs); // inouts 9
 
-            console.log("===============================================");
+            console.log("================================================");
             console.log("Splitter    : nr of input", splitter.numberOfInputs, "= 1 nr of out:", splitter.numberOfOutputs, "= 16");
             console.log("Merger      : nr of input ", merger.numberOfInputs, "= 16 nr of out:", merger.numberOfOutputs, "= 1");
             console.log("Route output:", this.audioRouteOutput);
@@ -655,6 +688,37 @@ export default class AudioPlayer {
 
             // Out from Omnitone decoder, send to audio context
             merger.connect(this.getCurrentDecoder.input);
+
+
+
+            // inputGain.connect(soaRenderer.input);
+            // inputGain.connect(toaRenderer.input);
+            // soaRenderer.output.connect(audioContext.destination);
+            // toaRenderer.output.connect(audioContext.destination);
+
+            // const splitter2 = this.audioContext.createChannelSplitter(2);
+            // const merger2 = this.audioContext.createChannelMerger(2);
+            // // connect the merger to the destination now.
+            // merger2.connect(this.audioContext.destination);
+
+            // // Gain node to control the volume of each channel.
+            // // const gainL = this.audioContext.createGain();
+            // // const gainR = this.audioContext.createGain();
+
+            // this.getCurrentDecoder.input.connect(splitter2);
+
+            // // audioSource is split into its separate channels.  For each channel connect
+            // // a different gain node so we can control the volume independently.
+            // splitter2.connect(merger2, 0, 0);
+            // splitter2.connect(merger2, 1, 0);
+
+            // Combine the output of each gain node back into one stream using the merger.
+            // gainL.connect(merger2, 0, 0);
+            // gainR.connect(merger2, 0, 1);
+
+            // Set the gain values for the left and right channels as desired.
+            // gainL.gain.value = 1;
+            // gainR.gain.value = 1;
 
             console.log(`AudioContext state '${this.audioContext.state}'`)
 
@@ -788,7 +852,6 @@ export default class AudioPlayer {
      * @param euler null
      */
     rotateSoundField(mtx3: any, euler: any = null) {
-        console.error("ROTATE!!!", mtx3);
         this.getCurrentDecoder.setRotationMatrix3(mtx3);
         this.rotationMtx3 = mtx3;
     }
