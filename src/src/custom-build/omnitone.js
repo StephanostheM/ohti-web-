@@ -158,7 +158,7 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
     }
     return buffer;
   };
-  Utils.splitBufferbyChannel = function(context, audioBuffer, splitBy) {
+  Utils.splitBufferByChannel = function(context, audioBuffer, splitBy) {
     if (audioBuffer.numberOfChannels <= splitBy) {
       Utils.throw('Utils.splitBuffer: Insufficient number of channels. (' +
           audioBuffer.numberOfChannels + ' splitted by ' + splitBy + ')');
@@ -1126,7 +1126,7 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
     return bufferList.load();
   };
   Omnitone.mergeBufferListByChannel = Utils.mergeBufferListByChannel;
-  Omnitone.splitBufferbyChannel = Utils.splitBufferbyChannel;
+  Omnitone.splitBufferByChannel = Utils.splitBufferByChannel;
   Omnitone.createFOAConvolver = function(context, hrirBufferList) {
     return new FOAConvolver(context, hrirBufferList);
   };

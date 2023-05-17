@@ -165,7 +165,7 @@ export default class AudioPlayer {
         this.decoderFOA = Omnitone.createFOARenderer(this.audioContext, {
             ambisonicOrder: 1,
             // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
-            channelMap: [0, 3, 1, 2]
+            // // : [0, 3, 1, 2]
         });
         this.decoderFOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
@@ -182,7 +182,6 @@ export default class AudioPlayer {
         this.magDecoderFOA = Omnitone.createFOARenderer(this.audioContext, {
             hrirBufferList: OmnitoneFOAHrirMagLsBase64,
             ambisonicOrder: 1,
-            channelMap: [0, 3, 1, 2]
         });
         this.magDecoderFOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
@@ -197,9 +196,9 @@ export default class AudioPlayer {
         // 4.b Creates Second Order Ambisonic Decoder (Google HRIR)
         this.decoderSOA = Omnitone.createHOARenderer(this.audioContext, {
             ambisonicOrder: 2,
-            // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
-            channelMap: [0, 3, 1, 2]
         });
+        // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
+        // channelMap: [0, 3, 1, 2]
         this.decoderSOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
             (Tool.$dom("btnToggleAudioPlayer") as HTMLButtonElement).disabled = false;
@@ -215,7 +214,6 @@ export default class AudioPlayer {
         this.magDecoderSOA = Omnitone.createHOARenderer(this.audioContext, {
             hrirBufferList: OmnitoneSOAHrirMagLsBase64,
             ambisonicOrder: 2,
-            channelMap: [0, 3, 1, 2]
         });
         this.magDecoderSOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
@@ -230,8 +228,6 @@ export default class AudioPlayer {
         // 4.c Creates Third Order Ambisonic Decoder (Google HRIR)
         this.decoderTOA = Omnitone.createHOARenderer(this.audioContext, {
             ambisonicOrder: 3,
-            // The example audio is in the FuMa ordering (W,X,Y,Z). So remap the channels to the ACN format.
-            channelMap: [0, 3, 1, 2]
         });
         this.decoderTOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
@@ -248,7 +244,6 @@ export default class AudioPlayer {
         this.magDecoderTOA = Omnitone.createHOARenderer(this.audioContext, {
             hrirBufferList: OmnitoneTOAHrirMagLsBase64,
             ambisonicOrder: 3,
-            channelMap: [0, 3, 1, 2]
         });
         this.magDecoderTOA.initialize().then(() => {
             (Tool.$dom("btnToggleAudioPlayback") as HTMLButtonElement).disabled = false;
@@ -273,9 +268,9 @@ export default class AudioPlayer {
         //decoder.setMode('off');
 
         // Creates FOA Rotator to use directly with more functions
-        var rotator = Omnitone.createFOARotator(this.audioContext);
+        // var rotator = Omnitone.createFOARotator(this.audioContext);
 
-        console.log({ rotator: rotator });
+        // console.log({ rotator: rotator });
 
         // ========
         // Add audio file drop and selector
@@ -658,7 +653,7 @@ export default class AudioPlayer {
             console.log("Decoder in  :", this.getCurrentDecoder.input);
             console.log("Decoder out :", this.getCurrentDecoder.output);
 
-            // Out from Omnitone decoder, send toaudio context
+            // Out from Omnitone decoder, send to audio context
             merger.connect(this.getCurrentDecoder.input);
 
             console.log(`AudioContext state '${this.audioContext.state}'`)
@@ -793,6 +788,7 @@ export default class AudioPlayer {
      * @param euler null
      */
     rotateSoundField(mtx3: any, euler: any = null) {
+        console.error("ROTATE!!!", mtx3);
         this.getCurrentDecoder.setRotationMatrix3(mtx3);
         this.rotationMtx3 = mtx3;
     }
