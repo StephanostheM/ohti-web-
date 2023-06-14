@@ -147,14 +147,18 @@
 
         <div class="ht-form--button">
             <!-- <div class="ht-custom-info--euler-info">x=red, Y=green, Z=blue</div><br/> -->
-            X roll (<span id="infoXValue">0</span>&deg;) = <span data-key="euler-x"></span>&deg;<span class="ht-axis-blip x"></span><br/>
-            <input id="inputRangeX" type="range" min="-89" max="89" value="0" step="1" class="range x" />
-            <br/>
-            Y pitch (<span id="infoYValue">0</span>&deg;) = <span data-key="euler-y"></span>&deg;<span class="ht-axis-blip y"></span><br/>
-            <input id="inputRangeY" type="range" min="-89" max="89" value="0" step="1" class="range y" />
-            <br/>
             Z yaw (<span id="infoZValue">0</span>&deg;) = <span data-key="euler-z"></span>&deg;<span class="ht-axis-blip z"></span><br/>
-            <input id="inputRangeZ" type="range" min="-179" max="179" value="0" step="1" style="direction: rtl" class="range z" />
+            <input id="inputRangeZ" type="range" min="-180" max="180" value="0" step="1" style="direction: rtl" class="range z" />
+            <br/>
+
+            Y pitch (<span id="infoYValue">0</span>&deg;) = <span data-key="euler-y"></span>&deg;<span class="ht-axis-blip y"></span><br/>
+            <input id="inputRangeY" type="range" min="-90" max="90" value="0" step="1" class="range y" />
+            <br/>
+
+            X roll (<span id="infoXValue">0</span>&deg;) = <span data-key="euler-x"></span>&deg;<span class="ht-axis-blip x"></span><br/>
+            <input id="inputRangeX" type="range" min="-90" max="90" value="0" step="1" class="range x" />
+            <br/>
+
         </div>
 
     </div>

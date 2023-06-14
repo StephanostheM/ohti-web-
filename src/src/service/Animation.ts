@@ -138,7 +138,8 @@ export default class AnimationView {
             let euler = QuaternionTools.toEuler(self.LIVEHTREFACTUAL, true);
             Tool.$attr("euler-x", (Math.round(euler.roll * 100) / 100));
             Tool.$attr("euler-y", (Math.round(euler.pitch * 100) / 100));
-            Tool.$attr("euler-z", (Math.round(euler.yaw * 100) / 100));
+            // INFO: compensating for the visual value only
+            Tool.$attr("euler-z", (Math.round(euler.yaw * 100) / 100) * -1) ;
 
             self.renderer.render( self.scene, self.camera );
         });
@@ -248,7 +249,8 @@ export default class AnimationView {
         let yawValue = parseFloat((Tool.$dom("inputRangeZ") as any).value); // yaw
         (Tool.$dom("infoXValue") as any).innerText = rollValue;
         (Tool.$dom("infoYValue") as any).innerText = pitchValue;
-        (Tool.$dom("infoZValue") as any).innerText = yawValue;
+        // INFO: compensating for the visual value only
+        (Tool.$dom("infoZValue") as any).innerText = yawValue * -1;
 
         rollValue = QuaternionTools.degreesToRadians(rollValue);
         pitchValue = QuaternionTools.degreesToRadians(pitchValue);
