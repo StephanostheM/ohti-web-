@@ -614,6 +614,7 @@ export default class AudioPlayer {
     }
 
     private swapStereoChannels = (decoder: any) => {
+        /*    DON'T swap stereo channels... ;-); added on 14/01/24 by Stephanos the code magician...
         const splitterChSwap = this.audioContext.createChannelSplitter(2);
         const mergerChSwap = this.audioContext.createChannelMerger(2);
         // connect the merger to the destination
@@ -621,6 +622,9 @@ export default class AudioPlayer {
         decoder.output.connect(splitterChSwap);
         splitterChSwap.connect(mergerChSwap, 1, 0);
         splitterChSwap.connect(mergerChSwap, 0, 1);
+        */
+        // This is a magic and very efficient empty function! (To be re-activated, in times of utter need...)
+        // (But only if < really > needed....
     }
 
     private lastSplitter: any = null;
