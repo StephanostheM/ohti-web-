@@ -140,6 +140,8 @@ export default class QuaternionTools {
 
         let mt = new Float32Array(9);
         // q: w0, x1, y2, z3
+
+        /* Former set of equations, refering to wrong coordinate system
         mt[0] = (1.0 - 2.0 * (q_y * q_y) - 2.0 * (q_z * q_z));
         mt[1] = (2.0 * q_x * q_y) - (2.0 * q_z * q_w);
         mt[2] = (2.0 * q_x * q_z) + (2.0 * q_y * q_w);
@@ -152,7 +154,29 @@ export default class QuaternionTools {
         mt[7] = (2.0 * q_y * q_z) + (2.0 * q_x * q_w);
         mt[8] = (1.0 - 2.0 * (q_x * q_x) - 2.0 * (q_y * q_y));
 
+        return mt;                  */
+
+        // New set of equations, added on 14/01/24 by Stefan Schreiber
+
+        mt[0] = 2.0 * (q_w * q_w) + 2.0 * (q_x * q_x) - 1;
+        mt[1] = 2.0 * q_x * q_y - 2.0 * q_w * q_z;   
+        // identical to above, suggesting different order of quaternion factors w and z
+        mt[2] = 2.0 * q_x * q_z + 2.0 * q_w * q_y;
+
+        mt[3] = 2.0 * q_x * q_y + 2.0 * q_w * q_z;
+        mt[4] = 2.0 * q_w * q_w + 2.0 * q_y * q_y -1;
+        // Changed 2nd equation
+        mt[5] = 2.0 * q_y * q_z - 2.0 * q_w * q_x;
+
+        mt[6] = 2.0 * q_x * q_z - 2.0 * q_w * q_y;
+        mt[7] = 2.0 * q_y * q_z + 2.0 * q_w * q_z;
+        mt[8] = 2.0 * q_w * q_w + 2.0 * q_z * q_z - 1;
+        // Changed 3rd equation
+
         return mt;
+
+        //   Comment brackets from before, seem to be superfluous...
+    
     }
 
     public static quaternionToMatrix(...args) {
