@@ -158,20 +158,32 @@ export default class QuaternionTools {
 
         // New set of equations, added on 14/01/24 by Stefan Schreiber
 
-        mt[0] = 2.0 * (q_w * q_w) + 2.0 * (q_x * q_x) - 1;
+        // Corrected equations for mt[0], mt[4] and mt[8]; added on 27/01/24m by Stefan Schreiber
+
+        // mt[0] = 2.0 * (q_w * q_w) + 2.0 * (q_x * q_x) - 1;
+        // replaced by new equation, 27/01/24
+
+        mt[0] = q[w] * q[w] + q[x] * q[x] - q[y] * q[y] - q[z] * q[z];
+        
         mt[1] = 2.0 * q_x * q_y - 2.0 * q_w * q_z;   
-        // identical to above, suggesting different order of quaternion factors w and z
+        // identical to above, introducing just different order of quaternion factors w and z
         mt[2] = 2.0 * q_x * q_z + 2.0 * q_w * q_y;
 
         mt[3] = 2.0 * q_x * q_y + 2.0 * q_w * q_z;
+        /*  Corrected 5th matrix element
         mt[4] = 2.0 * q_w * q_w + 2.0 * q_y * q_y -1;
-        // Changed 2nd equation
+        */
+        mt[4] = q_w * q_w - q_x * q_x + q_y * q_w - q_z * q_z;
+        // Changed on 27/01/24
         mt[5] = 2.0 * q_y * q_z - 2.0 * q_w * q_x;
 
         mt[6] = 2.0 * q_x * q_z - 2.0 * q_w * q_y;
         mt[7] = 2.0 * q_y * q_z + 2.0 * q_w * q_z;
+        /* Corrected 9th matrix element
         mt[8] = 2.0 * q_w * q_w + 2.0 * q_z * q_z - 1;
-        // Changed 3rd equation
+        */
+        mt[8] = q_w * q_w - q_x * q_x - q_y * q_y + q_z * q_z;
+        // Changed on 27/01/24
 
         return mt;
 
