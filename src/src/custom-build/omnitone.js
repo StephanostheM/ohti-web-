@@ -817,7 +817,9 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
       computeBandRotation(matrix, i);
     }
   }
-  function HOARotator(context, ambisonicOrder) {
+  function HOARotator(context, ambisonicOrder) 
+  /*
+  {
     this._context = context;
     this._ambisonicOrder = ambisonicOrder;
     const numberOfChannels = (ambisonicOrder + 1) * (ambisonicOrder + 1);
@@ -851,6 +853,10 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
     this.input = this._splitter;
     this.output = this._merger;
   }
+  Old HOA-Rotator function de-activated.
+
+  */
+  
   HOARotator.prototype.setRotationMatrix3 = function(rotationMatrix3) {
     this._gainNodeMatrix[0][0].gain.value = -rotationMatrix3[0];
     this._gainNodeMatrix[0][1].gain.value = rotationMatrix3[1];
