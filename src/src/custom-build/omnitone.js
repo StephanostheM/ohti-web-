@@ -852,9 +852,9 @@ export default class HOARotator {
         this.context = context;
         this.order = order;
         this.nCh = (order + 1) * (order + 1);
-        this.yaw = 0;
-        this.pitch = 0;
-        this.roll = 0;
+        // this.yaw = 0;
+        // this.pitch = 0;
+        // this.roll = 0;
         this.rotMtx = numeric.identity(this.nCh);
         this.rotMtxNodes = new Array(this.order);
         // Input and output nodes
@@ -914,12 +914,12 @@ export default class HOARotator {
     }
 */
 
-  /*
-    updateRotationFromCamera(matrix4) {
-        // console.log(matrix4);
-        this.rotMtx = jshlib.getSHrotMtx([[matrix4[10], matrix4[8], matrix4[9]], 
-                                          [matrix4[2], matrix4[0], matrix4[1]],
-                                          [matrix4[6], matrix4[4], matrix4[5]]], this.order);
+  
+    updateRotationMatrix(matrix3) {
+        // console.log(matrix3);
+        this.rotMtx = jshlib.getSHrotMtx([[matrix3[1], matrix3[4], matrix3[7]], 
+                                          [matrix3[2], matrix3[5], matrix3[8]],
+                                          [matrix3[3], matrix3[6], matrix3[9]]], this.order);
 
         // console.log(this.rotMtx);
 
@@ -934,7 +934,6 @@ export default class HOARotator {
             band_idx = band_idx + 2 * n + 1;
         }   
     }
-    */
 }
 
   /*
