@@ -842,8 +842,9 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
 /* HOA ROTATOR */
 /////////////////
 
-import * as jshlib from 'spherical-harmonic-transform';
-import * as numeric from 'numeric';
+// import * as jshlib from 'spherical-harmonic-transform';
+// import * as numeric from 'numeric';
+// All imports at AudioPlayer.TS ...  
 
 export default class HOARotator {
 
