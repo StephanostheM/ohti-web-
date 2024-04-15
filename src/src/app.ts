@@ -3,6 +3,10 @@ import AudioPlayer from "./service/AudioPlayer";
 import HeadtrackerListener from "./service/HeadtrackerListener";
 import Events from "./utils/Events";
 import Tool from './utils/Tools';
+// Added on 15th of April '24...
+import * as jshlib from 'spherical-harmonic-transform';
+import * as numeric from 'numeric';
+//
 
 export class Application {
     private listener: HeadtrackerListener;
