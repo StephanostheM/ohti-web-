@@ -917,9 +917,9 @@ export default class HOARotator {
   
     updateRotationMatrix(matrix3) {
         // console.log(matrix3);
-        this.rotMtx = jshlib.getSHrotMtx([[matrix3[1], matrix3[4], matrix3[7]], 
-                                          [matrix3[2], matrix3[5], matrix3[8]],
-                                          [matrix3[3], matrix3[6], matrix3[9]]], this.order);
+        this.rotMtx = jshlib.getSHrotMtx([[matrix3[0], matrix3[3], matrix3[6]], 
+                                          [matrix3[1], matrix3[4], matrix3[7]],
+                                          [matrix3[2], matrix3[5], matrix3[8]]], this.order);
 
         // console.log(this.rotMtx);
 
