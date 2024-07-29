@@ -554,12 +554,12 @@ ${Array.prototype.slice.call(arguments).join(' ')} \
     this.output = this._context.createGain();
     this._bypass = this._context.createGain();
     this._foaRouter = new FOARouter(this._context, this._config.channelMap);
-    this._foaRotator = new FOARotator(this._context);
+    // this._foaRotator = new FOARotator(this._context);
     this._foaConvolver = new FOAConvolver(this._context);
     this.input.connect(this._foaRouter.input);
     this.input.connect(this._bypass);
     this._foaRouter.output.connect(this._foaRotator.input);
-    this._foaRotator.output.connect(this._foaConvolver.input);
+    //  this._foaRotator.output.connect(this._foaConvolver.input);
     this._foaConvolver.output.connect(this.output);
     this.input.channelCount = 4;
     this.input.channelCountMode = 'explicit';
@@ -1120,12 +1120,12 @@ export default class HOARotator {
     this.input = this._context.createGain();
     this.output = this._context.createGain();
     this._bypass = this._context.createGain();
-    this._hoaRotator = new HOARotator(this._context, this._config.ambisonicOrder);
+    // this._hoaRotator = new HOARotator(this._context, this._config.ambisonicOrder);
     this._hoaConvolver =
         new HOAConvolver(this._context, this._config.ambisonicOrder);
-    this.input.connect(this._hoaRotator.input);
+    // this.input.connect(this._hoaRotator.input);
     this.input.connect(this._bypass);
-    this._hoaRotator.output.connect(this._hoaConvolver.input);
+    // this._hoaRotator.output.connect(this._hoaConvolver.input);
     this._hoaConvolver.output.connect(this.output);
     this.input.channelCount = this._config.numberOfChannels;
     this.input.channelCountMode = 'explicit';
